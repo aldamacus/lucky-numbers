@@ -26,6 +26,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+# Inject Streamlit secrets into env so vedastro_client picks up the API key
+# (works on Streamlit Community Cloud where secrets are set in the dashboard)
+try:
+    if hasattr(st, "secrets") and "VEDASTRO_API_KEY" in st.secrets:
+        os.environ.setdefault("VEDASTRO_API_KEY", st.secrets["VEDASTRO_API_KEY"])
+except Exception:
+    pass
+
 ANALYSIS    = ROOT / "data" / "historical" / "analysis"
 WIN_DAYS    = ROOT / "data" / "historical" / "planet_adjustments" / "win_days"
 AT_WINS     = ANALYSIS / "austria_lotto_6aus45_jackpot_wins.csv"

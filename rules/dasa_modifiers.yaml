@@ -1,0 +1,39 @@
+# Modifiers triggered by the active Vimshottari dasa lords.
+# planet_number mapping: Sun=1, Moon=2, Jupiter=3, Rahu=4, Mercury=5,
+#                        Venus=6, Ketu=7, Saturn=8, Mars=9
+modifiers:
+  - id: mahadasa_lord_emphasis
+    when: "true"
+    action: weight_planet
+    planet: "dasa.self.mahadasa"
+    weight: 3
+    reason: "Active Mahadasa lord gets harmonics boosted"
+
+  - id: bhukti_lord_emphasis
+    when: "true"
+    action: weight_planet
+    planet: "dasa.self.bhukti"
+    weight: 2
+    reason: "Active Bhukti (sub-period) lord boosted"
+
+  - id: antara_lord_emphasis
+    when: "true"
+    action: weight_planet
+    planet: "dasa.self.antara"
+    weight: 1
+    reason: "Active Antara lord boosted"
+
+  - id: son_mahadasa_emphasis
+    when: "true"
+    action: weight_planet
+    planet: "dasa.son.mahadasa"
+    weight: 1
+    reason: "Son's Mahadasa lord — small contribution"
+
+  - id: saturn_dasa_caution
+    when: "dasa.self.mahadasa == 'Saturn' and dasa.self.bhukti == 'Saturn'"
+    action: remove_range
+    low: 13
+    high: 13
+    reason: "Saturn-Saturn — drop classical 'unlucky' 13"
+

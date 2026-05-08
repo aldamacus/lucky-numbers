@@ -1,0 +1,28 @@
+systems:
+  eurojackpot:
+    description: "5 main numbers + 2 magic (Euro) numbers"
+    main:
+      count: 5
+      min: 1
+      max: 40
+    magic:
+      count: 2
+      min: 1
+      max: 10
+  euromillions:
+    description: "5 main numbers + 2 Lucky Stars (EuroMillions)"
+    main:
+      count: 5
+      min: 1
+      max: 50
+    magic:
+      count: 2
+      min: 1
+      max: 12
+  loto6:
+    description: "6 main numbers from 1 to 46"
+    main:
+      count: 6
+      min: 1
+      max: 46
+

@@ -1,0 +1,123 @@
+modifiers:
+- id: win_day_numbers_baseline_euromillions
+  when: system == 'euromillions'
+  action: add_many
+  values: &id001
+  - 7
+  - 8
+  - 3
+  - 4
+  - 12
+  - 5
+  - 11
+  - 9
+  - 6
+  - 17
+  - 10
+  - 2
+  - 1
+  - 42
+  - 33
+  - 44
+  - 25
+  - 27
+  weight: 5
+  reason: Win-day numbers baseline boost (system-specific).
+- id: win_day_sign_match_euromillions_sun_virgo
+  when: system == 'euromillions' and transits.self.sun.sign == 'Virgo'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Sun in Virgo at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_sun_scorpio
+  when: system == 'euromillions' and transits.self.sun.sign == 'Scorpio'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Sun in Scorpio at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_moon_gemini
+  when: system == 'euromillions' and transits.self.moon.sign == 'Gemini'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Moon in Gemini at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_moon_pisces
+  when: system == 'euromillions' and transits.self.moon.sign == 'Pisces'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Moon in Pisces at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_mars_gemini
+  when: system == 'euromillions' and transits.self.mars.sign == 'Gemini'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Mars in Gemini at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_mars_virgo
+  when: system == 'euromillions' and transits.self.mars.sign == 'Virgo'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Mars in Virgo at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_mercury_sagittarius
+  when: system == 'euromillions' and transits.self.mercury.sign == 'Sagittarius'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Mercury in Sagittarius
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_mercury_virgo
+  when: system == 'euromillions' and transits.self.mercury.sign == 'Virgo'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Mercury in Virgo at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_jupiter_taurus
+  when: system == 'euromillions' and transits.self.jupiter.sign == 'Taurus'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Jupiter in Taurus at
+    draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_jupiter_gemini
+  when: system == 'euromillions' and transits.self.jupiter.sign == 'Gemini'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Jupiter in Gemini at
+    draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_venus_cancer
+  when: system == 'euromillions' and transits.self.venus.sign == 'Cancer'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Venus in Cancer at draw
+    time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_venus_aquarius
+  when: system == 'euromillions' and transits.self.venus.sign == 'Aquarius'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Venus in Aquarius at
+    draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_saturn_aquarius
+  when: system == 'euromillions' and transits.self.saturn.sign == 'Aquarius'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Saturn in Aquarius at
+    draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_euromillions_saturn_pisces
+  when: system == 'euromillions' and transits.self.saturn.sign == 'Pisces'
+  action: add_many
+  values: *id001
+  weight: 9
+  reason: 'Win-day astrology bias: many jackpot-win days had Saturn in Pisces at draw
+    time; boost win-day numbers when today''s transits match.'

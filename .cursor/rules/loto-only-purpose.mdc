@@ -1,0 +1,14 @@
+---
+description: Keep this repo single-purpose: generate Loto numbers
+alwaysApply: true
+---
+# Single purpose: Loto number generation
+
+- This project’s **only purpose** is to generate **Loto numbers** (system: `loto6` in `configs/systems.yaml`).
+- Avoid adding features unrelated to Loto number generation (web UI, accounts, payments, dashboards, random “astrology readings”, etc.).
+- If a change is requested, prefer:
+  - improving `lucky generate loto6` output quality and auditability
+  - improving `lucky refresh` snapshot accuracy (via VedAstro)
+  - improving rule coverage in `rules/*.yaml`
+  - keeping results deterministic for the same inputs
+

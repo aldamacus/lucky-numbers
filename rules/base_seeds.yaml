@@ -1,0 +1,69 @@
+# Static seed numbers derived from birth + numerology.
+# Each entry contributes deterministic candidate numbers to the pool.
+seeds:
+  - id: self_root_number
+    expr: "self.numerology.root_number"
+    weight: 3
+    reason: "Father's numerology root (Mars/9)"
+
+  - id: self_name_number_compound
+    expr: "self.numerology.name_number"
+    weight: 2
+    reason: "Father's full name compound number (54)"
+
+  - id: self_birth_day
+    expr: "self.birth.day"
+    weight: 2
+    reason: "Father's birth day"
+
+  - id: self_birth_month
+    expr: "self.birth.month"
+    weight: 1
+    reason: "Father's birth month"
+
+  - id: self_lagna_index
+    expr: "self.natal.lagna_sign_index"
+    weight: 2
+    reason: "Father's Lagna (Virgo = 6)"
+
+  - id: self_moon_house
+    expr: "self.natal.moon_house"
+    weight: 1
+    reason: "Father's Moon house"
+
+  - id: son_birth_day
+    expr: "son.birth.day"
+    weight: 2
+    reason: "Son's birth day"
+
+  - id: son_birth_month
+    expr: "son.birth.month"
+    weight: 1
+    reason: "Son's birth month"
+
+  - id: son_lagna_index
+    expr: "son.natal.lagna_sign_index"
+    weight: 2
+    reason: "Son's Lagna (Sagittarius = 9)"
+
+  - id: son_jupiter_house
+    expr: "son.natal.jupiter_house"
+    weight: 2
+    reason: "Son's Jupiter house — natural benefic"
+
+  # Compounds (numerology favors compound numbers like 23, 32, 41)
+  - id: royal_star_23
+    expr: "23"
+    weight: 3
+    reason: "Royal Star of the Lion — protected success"
+
+  - id: jupiter_compound_3
+    expr: "3"
+    weight: 2
+    reason: "Jupiter root number"
+
+  - id: father_son_axis
+    expr: "(self.natal.lagna_sign_index + son.natal.lagna_sign_index) % 50"
+    weight: 2
+    reason: "Father+Son lagna axis = 6+9 = 15"
+

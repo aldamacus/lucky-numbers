@@ -1,0 +1,23 @@
+# Modifiers using BOTH father's and son's data jointly.
+modifiers:
+  - id: shared_lagna_axis
+    when: "true"
+    action: add
+    value: "self.natal.lagna_sign_index + son.natal.lagna_sign_index"
+    weight: 2
+    reason: "Combined lagna axis (6+9=15)"
+
+  - id: jupiter_son_house_blend
+    when: "true"
+    action: add
+    value: "(self.natal.jupiter_house + son.natal.jupiter_house) % 50"
+    weight: 1
+    reason: "Father+Son Jupiter house blend"
+
+  - id: birthday_sum
+    when: "true"
+    action: add
+    value: "(self.birth.day + son.birth.day) % 50"
+    weight: 2
+    reason: "Father day (12) + Son day (18) = 30"
+

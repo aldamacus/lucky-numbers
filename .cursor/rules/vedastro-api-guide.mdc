@@ -1,0 +1,10 @@
+---
+description: Treat VedAstro-API-Guide.md as VedAstro source of truth
+alwaysApply: true
+---
+# VedAstro documentation source of truth
+
+- When working on VedAstro integration (MCP tools, requests/responses, parameters, formats, timezones, dates, transits/dasa calls, enrichment scripts), **consult `VedAstro-API-Guide.md` first** and treat it as the source of truth.
+- Prefer updating code to match the guide over guessing tool names/fields.
+- If the guide conflicts with existing code, align code with the guide and update relevant READMEs/rules if needed.
+

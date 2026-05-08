@@ -1,0 +1,12 @@
+---
+description: Astrology data must come only from VedAstro snapshot/refresh
+alwaysApply: true
+---
+# Astrology: VedAstro only
+
+- For any astrological/transit/dasa/natal calculations, **use only VedAstro** as the source of truth.
+- Do **not** add or call any other astrology libraries, APIs, websites, ephemeris datasets, or “LLM astrology”.
+- The only allowed path for live sky data is:
+  - `lucky refresh` → `src/lucky_numbers/vedastro_client.py` → writes `data/snapshot.yaml`
+- Generation (`lucky generate loto6`) must read from `data/snapshot.yaml` and remain deterministic for the same snapshot + rules.
+

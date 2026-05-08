@@ -1,0 +1,42 @@
+# Modifiers triggered by current planetary transits over the natal chart.
+modifiers:
+  - id: jupiter_10th_blessing
+    when: "transits.self.jupiter.house == 10"
+    action: add
+    value: 3
+    weight: 4
+    reason: "Jupiter transiting 10th — career/expansion blessing"
+
+  - id: venus_9th_luck
+    when: "transits.self.venus.house == 9 and transits.self.venus.kaksha >= 1"
+    action: add
+    value: 6
+    weight: 4
+    reason: "Venus 9th house — fortune & dharma"
+
+  - id: mars_saturn_7th_caution
+    when: "transits.self.mars.house == 7 and transits.self.saturn.house == 7"
+    action: remove_range
+    low: 21
+    high: 28
+    reason: "Mars+Saturn 7th — partnership stress band excluded"
+
+  - id: high_bindu_planet_boost
+    when: "true"
+    action: weight_planet_strongest
+    reason: "Boost the number of whichever planet has highest Bindu now"
+
+  - id: jupiter_house_number
+    when: "true"
+    action: add
+    value: "transits.self.jupiter.house"
+    weight: 2
+    reason: "Current Jupiter house index"
+
+  - id: moon_transit_house
+    when: "true"
+    action: add
+    value: "transits.self.moon.house"
+    weight: 1
+    reason: "Moon's current house"
+

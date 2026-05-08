@@ -1,0 +1,26 @@
+modifiers:
+- id: win_day_number_bias_top
+  when: 'true'
+  action: add_many
+  values:
+  - 7
+  - 3
+  - 5
+  - 26
+  - 39
+  - 28
+  - 11
+  - 16
+  - 24
+  - 25
+  - 40
+  - 4
+  - 27
+  - 12
+  - 35
+  - 29
+  - 34
+  - 9
+  weight: 6
+  reason: Boost numbers frequently appearing on historical jackpot-win days (AT Lotto
+    6 aus 45), giving win-days higher importance.

@@ -18,18 +18,54 @@ Each number carries an audit trail: which rule put it in the pool and why.
 
 Both are configurable in `configs/systems.yaml`.
 
-## Install
-
+## Quick start
 
 ```bash
+# 1. Clone and enter the repo
+git clone https://github.com/aldamacus/lucky-numbers.git
 cd lucky-numbers
-python -m venv .venv 
-&& .venv/Scripts/activate
-&& .venv\Scripts\activate          # Windows
+
+# 2. Create a virtual environment and activate it
+python -m venv .venv
+.venv\Scripts\activate          # Windows PowerShell
+# source .venv/bin/activate     # macOS / Linux
+
+# 3. Install the package with all dependencies (including Streamlit)
 pip install -e .
+
+# 4. Set your VedAstro API key
+copy .env.example .env
+#    then open .env and set VEDASTRO_API_KEY=<your-key>
 ```
 
+## Web UI (branch `my_lucky_numbers`)
 
+A **Streamlit** dashboard lets you view the latest 10 jackpot-win draws and
+run every pipeline command from the browser — no terminal needed.
+
+```bash
+# Make sure you are on the right branch and dependencies are installed
+git checkout my_lucky_numbers
+pip install -e .
+
+# Start the dashboard
+streamlit run ui/streamlit_app.py
+```
+
+Open the URL Streamlit prints — usually **http://localhost:8501**.
+
+The dashboard has four command panels:
+
+| Panel | What it does |
+|---|---|
+| **Full pipeline (play)** | Refresh sky → update draws/pots → rebuild rules → generate → show win score |
+| **Generate (offline)** | Generate numbers instantly from the last cached snapshot |
+| **VedAstro refresh** | Pull fresh transits + dasa (or full numerology) from VedAstro |
+| **Data & rules** | Download draw history, enrich win-days with VedAstro, rebuild bias rules |
+
+> The win-draw tables require files under `data/historical/analysis/`.
+> On first run click **Update draws + pots + analysis** or run
+> `python -m lucky_numbers.cli play loto6 --skip-history` once.
 
 ## API Key (VedAstro)
 
@@ -182,9 +218,3 @@ For entertainment & symbolic exploration. No system can predict random draws.
 
 ## VedAstro docs
 - [VedAstro API Guide](./VedAstro-API-Guide.md)
-
-
-## run all with updated win-day rules
-python -m lucky_numbers.cli play loto6 --win-years 1
-
-python -m lucky_numbers.cli play euromillions --win-years 1

@@ -1873,6 +1873,7 @@ def main() -> None:
     _person_setup_sidebar()
 
     st.title("🍀 Lucky Numbers — Dashboard")
+    st.markdown("**Author:** Damacus")
     st.caption(
     #    f"Repo: `{ROOT}`  |  "
         f"VedAstro snapshot: `{_snapshot_age()}`  |  "

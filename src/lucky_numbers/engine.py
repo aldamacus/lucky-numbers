@@ -5,8 +5,22 @@ import hashlib
 from typing import Any
 
 from .loader import load_rule_files, load_snapshot, load_systems
-from .models import GenerationResult, Snapshot
+from .models import GenerationResult, Snapshot, PLANET_NUMBER
 from .seeds import build_pool
+
+
+def _seed_rank(seed: str, n: int) -> int:
+    """Stable per-seed pseudo-random rank for tie-breaking.
+
+    Two numbers with identical pool weight previously fell back to "smaller
+    number wins", which made the top-N pick collapse to the lowest numbers in
+    the historically-frequent winning list regardless of who Person 1 / 2 are.
+    Hashing (seed, n) means equal-weight numbers shuffle deterministically per
+    snapshot, so changing any person/relationship/dasa input visibly perturbs
+    the final pick.
+    """
+    h = hashlib.sha256(f"{seed}|{n}".encode()).digest()
+    return int.from_bytes(h[:8], "big")
 
 
 def _stable_pick(
@@ -16,9 +30,15 @@ def _stable_pick(
     hi: int,
     seed: str,
 ) -> list[int]:
-    """Deterministically pick `count` numbers from pool within [lo, hi]."""
+    """Deterministically pick `count` numbers from pool within [lo, hi].
+
+    Sort key:
+      1. weight desc      (rule-driven importance always wins)
+      2. seed-hash asc    (per-snapshot tie-break — person sensitive)
+      3. number asc       (final fallback for total determinism)
+    """
     candidates = [(n, w) for n, w in pool.items() if lo <= n <= hi]
-    candidates.sort(key=lambda x: (-x[1], x[0]))   # weight desc, then number asc
+    candidates.sort(key=lambda x: (-x[1], _seed_rank(seed, x[0]), x[0]))
     chosen: list[int] = []
     seen: set[int] = set()
     for n, _ in candidates:
@@ -60,14 +80,35 @@ def generate(
     ctx["system"] = system_name
     pool, audit = build_pool(rules, ctx)
 
-    # Include BOTH people’s live sky + dasa in the deterministic seed so
-    # outputs change when either person’s current snapshot changes.
+    # Inject relationship-date planet numbers directly into the pool.
+    # These derive from the sky on the marriage/hookup date and carry a
+    # fixed weight of 3 — influential but not dominant over rule weights.
+    if snapshot.relationship and snapshot.relationship.transits_on_date:
+        rel_pool_weight = 3
+        for planet_raw in snapshot.relationship.transits_on_date:
+            planet = str(planet_raw).capitalize()
+            pn = PLANET_NUMBER.get(planet)
+            if pn:
+                for n in range(pn, 51, pn):
+                    pool[n] = pool.get(n, 0) + rel_pool_weight
+
+    # Include BOTH people's live sky + dasa AND relationship in the
+    # deterministic seed so outputs change when any snapshot changes.
+    rel_seed = ""
+    if snapshot.relationship:
+        rel_seed = (
+            f"|rel_type={snapshot.relationship.relation_type}"
+            f"|rel_date={snapshot.relationship.event_date}"
+            f"|rel_sky={sorted(snapshot.relationship.transits_on_date.keys())}"
+        )
+
     seed = (
         f"{system_name}"
         f"|dasa_self={snapshot.dasa.get('self')}"
-        f"|dasa_son={snapshot.dasa.get('son')}"
+        f"|dasa_other={snapshot.dasa.get('other')}"
         f"|t_self={snapshot.transits.get('self', {})}"
-        f"|t_son={snapshot.transits.get('son', {})}"
+        f"|t_other={snapshot.transits.get('other', {})}"
+        f"{rel_seed}"
     )
 
     main_cfg = sys_cfg["main"]
@@ -79,4 +120,3 @@ def generate(
         magic = _stable_pick(pool, m["count"], m["min"], m["max"], seed + "|magic")
 
     return GenerationResult(system=system_name, main=main, magic=magic, audit=audit)
-

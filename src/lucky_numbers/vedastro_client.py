@@ -97,3 +97,50 @@ class VedAstroClient:
     def numerology(self, name: str):
         return self.call("get_numerology_prediction", {"name": name})
 
+    def sky_at_date(
+        self,
+        check_date: str,
+        check_time: str = "12:00",
+        check_timezone: str = "+00:00",
+        query_text: str = "planet positions signs houses",
+    ) -> dict[str, Any]:
+        """Return planetary positions for an arbitrary date (DD/MM/YYYY format).
+
+        Uses get_context_based_astrology_data with check_* fields so that no
+        birth data is required — only the sky at that moment matters.
+        """
+        return self.call("get_context_based_astrology_data", {
+            "check_date": check_date,
+            "check_time": check_time,
+            "check_timezone": check_timezone,
+            "query_text": query_text,
+        })
+
+    def natal_chart(
+        self,
+        birth_date: str,
+        birth_time: str,
+        lat: float,
+        lon: float,
+        tz: str,
+        query_text: str = (
+            "ascendant lagna sign and natal positions of all nine planets "
+            "(sun moon mars mercury jupiter venus saturn rahu ketu) "
+            "by sign and house"
+        ),
+    ) -> dict[str, Any]:
+        """Fetch natal-chart-level facts (ascendant + planet houses) per person.
+
+        The MCP tool decides which Calculate.* method to invoke based on
+        `query_text`. The response evidence typically contains
+        `AllPlanetSignsBasedOnHouseLongitudes` and a Lagna/Ascendant entry.
+        """
+        return self.call("get_context_based_astrology_data", {
+            "birth_date": birth_date,
+            "birth_time": birth_time,
+            "latitude": str(lat),
+            "longitude": str(lon),
+            "timezone": tz,
+            "query_text": query_text,
+        })
+

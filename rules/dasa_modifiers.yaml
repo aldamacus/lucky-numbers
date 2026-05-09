@@ -23,12 +23,19 @@ modifiers:
     weight: 1
     reason: "Active Antara lord boosted"
 
-  - id: son_mahadasa_emphasis
+  - id: other_mahadasa_emphasis
     when: "true"
     action: weight_planet
-    planet: "dasa.son.mahadasa"
+    planet: "dasa.other.mahadasa"
+    weight: 2
+    reason: "Person 2 (other) Mahadasa lord — secondary contribution (~½ of Person 1)"
+
+  - id: other_bhukti_emphasis
+    when: "true"
+    action: weight_planet
+    planet: "dasa.other.bhukti"
     weight: 1
-    reason: "Son's Mahadasa lord — small contribution"
+    reason: "Person 2 (other) Bhukti (sub-period) lord — minor contribution"
 
   - id: saturn_dasa_caution
     when: "dasa.self.mahadasa == 'Saturn' and dasa.self.bhukti == 'Saturn'"

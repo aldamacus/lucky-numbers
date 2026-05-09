@@ -28,96 +28,194 @@ modifiers:
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Sun in Sagittarius at
-    draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Sun in Sagittarius
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_sun_sagittarius
+  when: system == 'loto6' and transits.other.sun.sign == 'Sagittarius'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Sun in Sagittarius in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_sun_pisces
   when: system == 'loto6' and transits.self.sun.sign == 'Pisces'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Sun in Pisces at draw
-    time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Sun in Pisces
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_sun_pisces
+  when: system == 'loto6' and transits.other.sun.sign == 'Pisces'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Sun in Pisces in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_moon_sagittarius
   when: system == 'loto6' and transits.self.moon.sign == 'Sagittarius'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Moon in Sagittarius at
-    draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Moon in Sagittarius
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_moon_sagittarius
+  when: system == 'loto6' and transits.other.moon.sign == 'Sagittarius'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Moon in Sagittarius in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_moon_libra
   when: system == 'loto6' and transits.self.moon.sign == 'Libra'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Moon in Libra at draw
-    time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Moon in Libra
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_moon_libra
+  when: system == 'loto6' and transits.other.moon.sign == 'Libra'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Moon in Libra in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_mars_cancer
   when: system == 'loto6' and transits.self.mars.sign == 'Cancer'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Mars in Cancer at draw
-    time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Mars in Cancer
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_mars_cancer
+  when: system == 'loto6' and transits.other.mars.sign == 'Cancer'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Mars in Cancer in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_mars_scorpio
   when: system == 'loto6' and transits.self.mars.sign == 'Scorpio'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Mars in Scorpio at draw
-    time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Mars in Scorpio
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_mars_scorpio
+  when: system == 'loto6' and transits.other.mars.sign == 'Scorpio'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Mars in Scorpio in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_mercury_sagittarius
   when: system == 'loto6' and transits.self.mercury.sign == 'Sagittarius'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Mercury in Sagittarius
-    at draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Mercury in
+    Sagittarius at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_mercury_sagittarius
+  when: system == 'loto6' and transits.other.mercury.sign == 'Sagittarius'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Mercury in Sagittarius in Person 2''s
+    current sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_mercury_aquarius
   when: system == 'loto6' and transits.self.mercury.sign == 'Aquarius'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Mercury in Aquarius at
-    draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Mercury in
+    Aquarius at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_mercury_aquarius
+  when: system == 'loto6' and transits.other.mercury.sign == 'Aquarius'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Mercury in Aquarius in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_jupiter_gemini
   when: system == 'loto6' and transits.self.jupiter.sign == 'Gemini'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Jupiter in Gemini at
-    draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Jupiter in
+    Gemini at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_jupiter_gemini
+  when: system == 'loto6' and transits.other.jupiter.sign == 'Gemini'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Jupiter in Gemini in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_jupiter_taurus
   when: system == 'loto6' and transits.self.jupiter.sign == 'Taurus'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Jupiter in Taurus at
-    draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Jupiter in
+    Taurus at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_jupiter_taurus
+  when: system == 'loto6' and transits.other.jupiter.sign == 'Taurus'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Jupiter in Taurus in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_venus_aquarius
   when: system == 'loto6' and transits.self.venus.sign == 'Aquarius'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Venus in Aquarius at
-    draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Venus in Aquarius
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_venus_aquarius
+  when: system == 'loto6' and transits.other.venus.sign == 'Aquarius'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Venus in Aquarius in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_venus_aries
   when: system == 'loto6' and transits.self.venus.sign == 'Aries'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Venus in Aries at draw
-    time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Venus in Aries
+    at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_venus_aries
+  when: system == 'loto6' and transits.other.venus.sign == 'Aries'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Venus in Aries in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_saturn_aquarius
   when: system == 'loto6' and transits.self.saturn.sign == 'Aquarius'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Saturn in Aquarius at
-    draw time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Saturn in
+    Aquarius at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_saturn_aquarius
+  when: system == 'loto6' and transits.other.saturn.sign == 'Aquarius'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Saturn in Aquarius in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'
 - id: win_day_sign_match_loto6_saturn_pisces
   when: system == 'loto6' and transits.self.saturn.sign == 'Pisces'
   action: add_many
   values: *id001
   weight: 9
-  reason: 'Win-day astrology bias: many jackpot-win days had Saturn in Pisces at draw
-    time; boost win-day numbers when today''s transits match.'
+  reason: 'Win-day astrology bias (Person 1): many jackpot-win days had Saturn in
+    Pisces at draw time; boost win-day numbers when today''s transits match.'
+- id: win_day_sign_match_loto6_other_saturn_pisces
+  when: system == 'loto6' and transits.other.saturn.sign == 'Pisces'
+  action: add_many
+  values: *id001
+  weight: 4
+  reason: 'Win-day astrology bias (Person 2): Saturn in Pisces in Person 2''s current
+    sky matches a historical jackpot-win signature — secondary boost.'

@@ -170,6 +170,7 @@ def build_rules(cfg: GameCfg, *, top_numbers: int = 18, top_signs_per_planet: in
     for planet in PLANETS:
         common = [s for s, _ in sign_counts[planet].most_common(top_signs_per_planet)]
         for sign in common:
+            # Person 1 (protagonist) — full strength
             modifiers.append({
                 "id": f"win_day_sign_match_{cfg.system}_{planet}_{sign}".lower().replace(" ", "_"),
                 "when": f"system == '{cfg.system}' and transits.self.{planet}.sign == '{sign}'",
@@ -177,8 +178,23 @@ def build_rules(cfg: GameCfg, *, top_numbers: int = 18, top_signs_per_planet: in
                 "values": top_nums,
                 "weight": 9,
                 "reason": (
-                    f"Win-day astrology bias: many jackpot-win days had {planet.title()} in {sign} "
-                    "at draw time; boost win-day numbers when today's transits match."
+                    f"Win-day astrology bias (Person 1): many jackpot-win days had "
+                    f"{planet.title()} in {sign} at draw time; boost win-day numbers "
+                    "when today's transits match."
+                ),
+            })
+            # Person 2 (secondary) — about half the weight so they nudge the
+            # pool but cannot out-vote Person 1's signature.
+            modifiers.append({
+                "id": f"win_day_sign_match_{cfg.system}_other_{planet}_{sign}".lower().replace(" ", "_"),
+                "when": f"system == '{cfg.system}' and transits.other.{planet}.sign == '{sign}'",
+                "action": "add_many",
+                "values": top_nums,
+                "weight": 4,
+                "reason": (
+                    f"Win-day astrology bias (Person 2): {planet.title()} in {sign} "
+                    "in Person 2's current sky matches a historical jackpot-win "
+                    "signature — secondary boost."
                 ),
             })
 

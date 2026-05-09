@@ -1,23 +1,22 @@
-# Modifiers using BOTH father's and son's data jointly.
+# Modifiers using BOTH Person 1's (self) and Person 2's (other) data jointly.
 modifiers:
   - id: shared_lagna_axis
     when: "true"
     action: add
-    value: "self.natal.lagna_sign_index + son.natal.lagna_sign_index"
+    value: "self.natal.lagna_sign_index + other.natal.lagna_sign_index"
     weight: 2
-    reason: "Combined lagna axis (6+9=15)"
+    reason: "Combined Person 1 + Person 2 lagna axis"
 
-  - id: jupiter_son_house_blend
+  - id: jupiter_other_house_blend
     when: "true"
     action: add
-    value: "(self.natal.jupiter_house + son.natal.jupiter_house) % 50"
+    value: "(self.natal.jupiter_house + other.natal.jupiter_house) % 50"
     weight: 1
-    reason: "Father+Son Jupiter house blend"
+    reason: "Person 1 + Person 2 Jupiter house blend"
 
   - id: birthday_sum
     when: "true"
     action: add
-    value: "(self.birth.day + son.birth.day) % 50"
+    value: "(self.birth.day + other.birth.day) % 50"
     weight: 2
-    reason: "Father day (12) + Son day (18) = 30"
-
+    reason: "Person 1 birth-day + Person 2 birth-day (mod 50)"

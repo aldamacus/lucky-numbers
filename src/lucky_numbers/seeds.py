@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import Any
 
 from .models import AuditEntry, PLANET_NUMBER
-from .rules import RuleEvaluator
+from .rules import RuleEvaluator, WhenEvaluationError
 
 
 def _coerce_to_ints(value: Any) -> list[int]:
@@ -46,8 +46,26 @@ def build_pool(
         reason = rule.get("reason", "")
         weight = int(rule.get("weight", 1))
 
-        # Skip when-clause failures
-        if not ev.truthy_when(rule.get("when", True)):
+        # Evaluate `when` clause. If it raises (missing context key, attr
+        # error), record an audit entry so silently-broken rules become
+        # visible in --explain output and the Streamlit audit panel.
+        try:
+            matched = ev.truthy_when(rule.get("when", True))
+        except WhenEvaluationError as e:
+            audit.append(AuditEntry(
+                rule_id=rid, action="when-skipped", numbers=[],
+                weight=weight,
+                reason=f"SKIPPED — `when` could not be evaluated ({e}). "
+                       f"Likely missing snapshot field. Original reason: {reason}",
+            ))
+            continue
+        except Exception as e:
+            audit.append(AuditEntry(
+                rule_id=rid, action="when-error", numbers=[],
+                weight=weight, reason=f"ERROR in when-guard: {e}",
+            ))
+            continue
+        if not matched:
             continue
 
         action = rule.get("action") or ("seed" if kind == "seeds" else None)

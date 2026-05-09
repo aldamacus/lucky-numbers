@@ -8,6 +8,16 @@ from simpleeval import EvalWithCompoundTypes
 from .models import PLANET_NUMBER
 
 
+class WhenEvaluationError(ValueError):
+    """Raised when a rule's `when` expression cannot be evaluated.
+
+    Distinguishes "could not evaluate" (missing context key, attr error) from
+    "evaluated to False" (rule legitimately did not match). The caller in
+    seeds.py turns this into a visible audit entry so silently-broken rules
+    are no longer hidden.
+    """
+
+
 class RuleEvaluator:
     def __init__(self, context: dict[str, Any]):
         self.context = context
@@ -27,6 +37,13 @@ class RuleEvaluator:
             raise ValueError(f"Failed to evaluate '{expr}': {e}") from e
 
     def truthy_when(self, when: Any) -> bool:
+        """Evaluate a `when` clause.
+
+        Raises WhenEvaluationError when the expression itself cannot be
+        evaluated (missing key/attr in context). Returns False only when the
+        expression was successfully evaluated to a falsy value. The caller
+        records the error in the audit trail rather than silently skipping.
+        """
         if when is None or when == "" or when is True:
             return True
         if when is False:
@@ -37,7 +54,10 @@ class RuleEvaluator:
                 return True
             if s in ("false", "no", "0"):
                 return False
-        return bool(self.eval_expr(when))
+        try:
+            return bool(self.eval_expr(when))
+        except Exception as e:
+            raise WhenEvaluationError(str(e)) from e
 
     @staticmethod
     def planet_number(planet: str) -> int:

@@ -216,5 +216,33 @@ The rule context includes a `system` value. You can branch rules like:
 ## Disclaimer
 For entertainment & symbolic exploration. No system can predict random draws.
 
-## VedAstro docs
+## Documentation
+- [Technical documentation](./TECHNICAL.md) — full algorithm, rule engine, weight pyramid, determinism contract, extension points
 - [VedAstro API Guide](./VedAstro-API-Guide.md)
+
+
+### 
+
+reach via https://lucky-numbers-wo9yazltz74sarpugqs87x.streamlit.app/
+
+
+## Top-down data flow
+
+```
+UI form / people.yaml
+     ↓
+VedAstro fetch (per person + relationship event) + local Chaldean numerology
+     ↓
+Snapshot { self_, other, transits.{self,son}, dasa.{self,son}, natal+numerology, relationship }
+     ↓
+Rule engine (build_pool)  ── reads YAML rules → weighted pool {number: weight}
+     ↓
++ relationship-planet harmonics injected directly (fixed weight 3)
+     ↓
+_stable_pick(pool, count, lo, hi, seed)   — sort: weight desc, seed-hash, number asc
+     ↓
+main + magic numbers   (with full audit trail)
+```
+
+See [TECHNICAL.md](./TECHNICAL.md) for the full per-module breakdown and weight pyramid.
+

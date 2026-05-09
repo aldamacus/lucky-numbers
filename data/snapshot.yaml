@@ -1,42 +1,18 @@
-generated_at: '2026-05-08T21:16:52.282923+00:00'
+generated_at: '2026-05-09T00:12:04.987956+00:00'
 self:
   numerology:
-    name: Alexandru Damacus
-    name_number: 54
+    name: Alex Damacus
+    name_number: 36
     root_number: 9
     ruling_planet: Mars
-  natal:
-    lagna_sign: Virgo
-    lagna_sign_index: 6
-    lagna_lord: Mercury
-    moon_sign: Aquarius
-    moon_house: 6
-    sun_house: 12
-    saturn_house: 1
-    jupiter_house: 12
-    rahu_house: 11
-    ketu_house: 5
-    venus_house: 2
-    mars_house: 8
-son:
+  natal: {}
+other:
   numerology:
-    name: David Damacus
-    name_number: null
-    root_number: null
-    ruling_planet: null
-  natal:
-    lagna_sign: Sagittarius
-    lagna_sign_index: 9
-    lagna_lord: Jupiter
-    moon_sign: Sagittarius
-    moon_house: 1
-    sun_house: 1
-    saturn_house: 1
-    jupiter_house: 11
-    rahu_house: 8
-    ketu_house: 2
-    venus_house: 12
-    mars_house: 11
+    name: Iulia Parlog
+    name_number: 36
+    root_number: 9
+    ruling_planet: Mars
+  natal: {}
 transits:
   self:
     sun:
@@ -81,55 +57,59 @@ transits:
       kaksha: 1
       ashtaka: 2
       sarvashtaka: 33
-  son:
+  other:
     sun:
       sign: Aries
       house: 1
       kaksha: 0
-      ashtaka: 4
-      sarvashtaka: 28
+      ashtaka: 5
+      sarvashtaka: 30
     moon:
       sign: Capricorn
       house: 10
       kaksha: 0
-      ashtaka: 4
-      sarvashtaka: 19
+      ashtaka: 0
+      sarvashtaka: 30
     mars:
       sign: Pisces
       house: 12
-      kaksha: 0
-      ashtaka: 3
-      sarvashtaka: 28
+      kaksha: 1
+      ashtaka: 2
+      sarvashtaka: 26
     mercury:
       sign: Aries
       house: 1
       kaksha: 1
       ashtaka: 4
-      sarvashtaka: 28
+      sarvashtaka: 30
     jupiter:
       sign: Gemini
       house: 3
-      kaksha: 0
-      ashtaka: 2
-      sarvashtaka: 23
+      kaksha: 1
+      ashtaka: 6
+      sarvashtaka: 27
     venus:
       sign: Taurus
       house: 2
-      kaksha: 0
-      ashtaka: 1
-      sarvashtaka: 30
+      kaksha: 1
+      ashtaka: 6
+      sarvashtaka: 24
     saturn:
       sign: Pisces
       house: 12
       kaksha: 0
-      ashtaka: 3
-      sarvashtaka: 28
+      ashtaka: 5
+      sarvashtaka: 26
 dasa:
   self:
     mahadasa: null
     bhukti: null
     antara: null
-  son:
+  other:
     mahadasa: null
     bhukti: null
     antara: null
+relationship:
+  type: Relationship
+  date: '2025-09-24'
+  transits_on_date: {}

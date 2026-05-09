@@ -161,13 +161,14 @@ def cmd_play(
 def cmd_show():
     """Show the loaded snapshot summary."""
     s = load_snapshot()
-    console.print("[bold]Father:[/]", s.self_.name, "—", s.self_.birth.location)
-    console.print("[bold]Son:[/]", s.son.name, "—", s.son.birth.location)
-    console.print("[bold]Father lagna:[/]", s.self_.natal.get("lagna_sign"))
-    console.print("[bold]Son lagna:[/]", s.son.natal.get("lagna_sign"))
-    console.print("[bold]Father dasa:[/]", s.dasa.get("self"))
-    console.print("[bold]Son dasa:[/]", s.dasa.get("son"))
-    console.print("[bold]Father Jupiter house (transit):[/]",
+    other = s.other if s.other is not None else s.self_
+    console.print("[bold]Person 1 (self):[/]", s.self_.name, "—", s.self_.birth.location)
+    console.print("[bold]Person 2 (other):[/]", other.name, "—", other.birth.location)
+    console.print("[bold]Self lagna:[/]", s.self_.natal.get("lagna_sign"))
+    console.print("[bold]Other lagna:[/]", other.natal.get("lagna_sign"))
+    console.print("[bold]Self dasa:[/]", s.dasa.get("self"))
+    console.print("[bold]Other dasa:[/]", s.dasa.get("other"))
+    console.print("[bold]Self Jupiter house (transit):[/]",
                   s.transits.get("self", {}).get("jupiter", {}).get("house"))
 
 
@@ -185,15 +186,32 @@ def cmd_refresh(
     from .loader import load_people, ROOT
     from .vedastro_client import VedAstroClient
 
-    self_, son = load_people()
+    self_, other = load_people()
     snap_path: Path = ROOT / "data" / "snapshot.yaml"
-    snap = yaml.safe_load(snap_path.read_text(encoding="utf-8"))
+    snap = yaml.safe_load(snap_path.read_text(encoding="utf-8")) or {}
+
+    # One-time migration: rename legacy `son` keys to `other` in-place
+    for sect in ("transits", "dasa"):
+        if isinstance(snap.get(sect), dict) and "son" in snap[sect]:
+            snap[sect]["other"] = snap[sect].pop("son")
+    if "son" in snap and "other" not in snap:
+        snap["other"] = snap.pop("son")
+
+    # Populate each person's natal block from the existing snapshot so the
+    # lagna_sign_index is correct when computing transit houses below. Without
+    # this the house calc falls back to lagna=1 (Aries), producing wrong
+    # houses whenever the person changes (e.g. UI fetched new persons before
+    # calling refresh).
+    self_.natal      = snap.get("self", {}).get("natal", {}) or {}
+    self_.numerology = snap.get("self", {}).get("numerology", {}) or {}
+    other.natal      = snap.get("other", {}).get("natal", {}) or {}
+    other.numerology = snap.get("other", {}).get("numerology", {}) or {}
 
     def _ddmmyyyy(d) -> str:
         return f"{d.day:02d}/{d.month:02d}/{d.year}"
 
     with VedAstroClient() as v:
-        for label, person in [("self", self_), ("son", son)]:
+        for label, person in [("self", self_), ("other", other)]:
             if transits:
                 console.print(f"[cyan]→ transits ({label})…[/]")
                 res = v.transits(

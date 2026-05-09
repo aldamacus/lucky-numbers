@@ -53,21 +53,49 @@ class Person:
 
 
 @dataclass
+class RelationshipData:
+    """Describes the bond between two people and planets on their event date."""
+    relation_type: str          # Father-Son | Father-Daughter | Mother-Son | Mother-Daughter | Married | Relationship
+    event_date: date            # marriage date (Married) or start date (Relationship)
+    transits_on_date: dict[str, Any] = field(default_factory=dict)  # planet -> {sign, house, …}
+
+
+@dataclass
 class Snapshot:
-    """All facts the rule engine sees, in one place."""
+    """All facts the rule engine sees, in one place.
+
+    `self_` is the protagonist (Person 1). `other` is the optional second
+    person (Person 2). When `other` is None the rule engine falls back to
+    using `self_` as a stand-in, so single-person setups still satisfy
+    rules that reference `other.*`.
+    """
     self_: Person
-    son: Person
-    transits: dict[str, dict[str, dict[str, Any]]]   # subject -> planet -> facts
+    transits: dict[str, dict[str, dict[str, Any]]]   # subject ("self"|"other") -> planet -> facts
     dasa: dict[str, dict[str, str]]                  # subject -> {mahadasa,bhukti,antara}
+    other: Person | None = None
+    relationship: RelationshipData | None = None
 
     def as_context(self) -> dict[str, Any]:
-        """Flatten into the dict used by rule expressions."""
-        return {
+        """Flatten into the dict used by rule expressions.
+
+        Always populates an `other` key. If no second person was supplied,
+        `other` aliases to `self`, so rules reading `other.birth.day` still
+        evaluate cleanly (they'll just match Person 1).
+        """
+        other_person = self.other if self.other is not None else self.self_
+        ctx: dict[str, Any] = {
             "self": self._person_dict(self.self_),
-            "son": self._person_dict(self.son),
+            "other": self._person_dict(other_person),
             "transits": self.transits,
             "dasa": self.dasa,
         }
+        if self.relationship is not None:
+            ctx["relationship"] = {
+                "type": self.relationship.relation_type,
+                "date": str(self.relationship.event_date),
+                "transits_on_date": self.relationship.transits_on_date,
+            }
+        return ctx
 
     @staticmethod
     def _person_dict(p: Person) -> dict[str, Any]:

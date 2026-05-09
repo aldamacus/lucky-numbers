@@ -1873,7 +1873,12 @@ def main() -> None:
     _person_setup_sidebar()
 
     st.title("🍀 Lucky Numbers — Dashboard")
-    st.markdown("**Author:** Damacus")
+    st.markdown("**Author:** Zbatacel")
+    st.info(
+        "🎰 If these numbers help you win — please consider sending a small "
+        "thank-you tip to [paypal.me/zbatacel1981](https://paypal.me/zbatacel1981). "
+        "Good luck! 🍀"
+    )
     st.caption(
     #    f"Repo: `{ROOT}`  |  "
         f"VedAstro snapshot: `{_snapshot_age()}`  |  "

@@ -27,11 +27,14 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-# Inject Streamlit secrets into env so vedastro_client picks up the API key
-# (works on Streamlit Community Cloud where secrets are set in the dashboard)
+# Inject Streamlit secrets into env so vedastro_client + the access gate
+# pick them up (works on Streamlit Community Cloud where secrets are set in
+# the dashboard, and locally when keys are exported in the shell or .env).
 try:
-    if hasattr(st, "secrets") and "VEDASTRO_API_KEY" in st.secrets:
-        os.environ.setdefault("VEDASTRO_API_KEY", st.secrets["VEDASTRO_API_KEY"])
+    if hasattr(st, "secrets"):
+        for _k in ("VEDASTRO_API_KEY", "LUCKY_NUMBERS_ACCESS_KEYS"):
+            if _k in st.secrets:
+                os.environ.setdefault(_k, str(st.secrets[_k]))
 except Exception:
     pass
 
@@ -802,6 +805,12 @@ def _save_form_state() -> None:
     rel_date = ss.get("rel_date")
     if rel_date is not None and hasattr(rel_date, "strftime"):
         state["rel_date"] = rel_date.strftime("%Y-%m-%d")
+    # Access-gate persistence: free-trial counter + auth fingerprint
+    # (fingerprint only, never the raw key).
+    for key in ("_free_uses_count", "_auth_fp"):
+        val = ss.get(key)
+        if val is not None:
+            state[key] = val
     _ensure_cache_dir()
     _FORM_STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -823,8 +832,160 @@ def _preload_form_state() -> None:
                     val = int(val)
                 except Exception:
                     val = 1
+            if key == "_free_uses_count":
+                try:
+                    val = int(val)
+                except Exception:
+                    val = 0
             st.session_state[key] = val
     st.session_state["_form_loaded"] = True
+
+
+# ── Access gate (free trial + key-based unlock) ──────────────────────────────
+#
+# Free-trial model:
+#   - Anyone can run up to FREE_USES_LIMIT generations (Generate * + Play *)
+#     per browser-cookie session. The counter is persisted in form_state.json
+#     so it survives page reloads.
+#   - After the trial is exhausted, the user must enter a valid access key
+#     to keep generating. Keys are configured by the operator in the
+#     LUCKY_NUMBERS_ACCESS_KEYS env var (or Streamlit secret) as a comma-
+#     separated list. They are NEVER stored on disk in plaintext — only a
+#     SHA-256 fingerprint of the validated key is persisted, so a subsequent
+#     reload knows the user already authenticated this browser.
+#   - If LUCKY_NUMBERS_ACCESS_KEYS is unset/empty the gate is disabled
+#     (open-access mode, useful in dev).
+
+FREE_USES_LIMIT = 4
+_ACCESS_KEYS_ENV = "LUCKY_NUMBERS_ACCESS_KEYS"
+
+
+def _get_access_keys() -> set[str]:
+    """Parse the operator-configured access keys (comma/whitespace separated)."""
+    raw = os.environ.get(_ACCESS_KEYS_ENV, "") or ""
+    keys: set[str] = set()
+    for chunk in raw.replace("\n", ",").split(","):
+        k = chunk.strip()
+        if k:
+            keys.add(k)
+    return keys
+
+
+def _gate_enabled() -> bool:
+    """True when the operator configured any access keys (i.e. real deployment)."""
+    return bool(_get_access_keys())
+
+
+def _key_fingerprint(key: str) -> str:
+    return hashlib.sha256(("lucky-numbers-v1|" + key).encode()).hexdigest()
+
+
+def _valid_key_fingerprints() -> set[str]:
+    return {_key_fingerprint(k) for k in _get_access_keys()}
+
+
+def _is_authenticated() -> bool:
+    """Check session-level auth, validated against the current env keys."""
+    fp = st.session_state.get("_auth_fp")
+    if not fp:
+        return False
+    return fp in _valid_key_fingerprints()
+
+
+def _free_uses_used() -> int:
+    return int(st.session_state.get("_free_uses_count", 0) or 0)
+
+
+def _free_uses_remaining() -> int:
+    return max(0, FREE_USES_LIMIT - _free_uses_used())
+
+
+def _can_generate() -> bool:
+    if not _gate_enabled():
+        return True
+    if _is_authenticated():
+        return True
+    return _free_uses_remaining() > 0
+
+
+def _consume_free_use() -> None:
+    """Increment the free-trial counter (no-op for authenticated users)."""
+    if not _gate_enabled() or _is_authenticated():
+        return
+    st.session_state["_free_uses_count"] = _free_uses_used() + 1
+    _save_form_state()
+
+
+def _try_login(submitted_key: str) -> bool:
+    if not _gate_enabled():
+        return False
+    fp = _key_fingerprint(submitted_key.strip())
+    if fp in _valid_key_fingerprints():
+        st.session_state["_auth_fp"] = fp
+        _save_form_state()
+        return True
+    return False
+
+
+def _logout() -> None:
+    st.session_state.pop("_auth_fp", None)
+    _save_form_state()
+
+
+def _render_access_panel() -> None:
+    """Trial counter + login form / logged-in badge.
+
+    Render once at the top of the Generate section so the user always sees
+    where they stand. Buttons themselves are still disabled when the trial
+    is exhausted, so this is the only place to unlock.
+    """
+    if not _gate_enabled():
+        st.caption(
+            "🟢 **Open-access mode** (operator has not configured "
+            f"`{_ACCESS_KEYS_ENV}` — set it to enable the access gate)."
+        )
+        return
+
+    if _is_authenticated():
+        col1, col2 = st.columns([5, 1])
+        with col1:
+            st.success("✅ **Access key validated** — unlimited generations.")
+        with col2:
+            if st.button("Log out", use_container_width=True, key="logout_btn"):
+                _logout()
+                st.rerun()
+        return
+
+    remaining = _free_uses_remaining()
+    if remaining > 0:
+        st.info(
+            f"🎁 **Free trial:** {remaining} of {FREE_USES_LIMIT} generation(s) remaining. "
+            "After that you'll need an access key to continue."
+        )
+    else:
+        st.warning(
+            "🔒 **Free trial used up.** Enter your access key below to keep "
+            "generating numbers."
+        )
+
+    with st.expander("🔑 Enter access key", expanded=remaining == 0):
+        with st.form("access_key_form", clear_on_submit=True):
+            key_input = st.text_input(
+                "Access key", type="password",
+                placeholder="paste the key your operator gave you",
+                help="Operator configures valid keys via the "
+                     f"`{_ACCESS_KEYS_ENV}` environment variable.",
+            )
+            ok = st.form_submit_button("Unlock", type="primary",
+                                       use_container_width=True)
+            if ok:
+                if not key_input.strip():
+                    st.error("Please paste a key.")
+                elif _try_login(key_input):
+                    st.success("Validated — reloading…")
+                    st.rerun()
+                else:
+                    st.error("Invalid access key.")
 
 
 # ── VedAstro result cache (keyed by person-data hash) ────────────────────────
@@ -1749,6 +1910,11 @@ def main() -> None:
     st.divider()
     st.header("Generate lucky numbers")
 
+    # Access gate (free-trial counter + login form) — must be rendered BEFORE
+    # the generate buttons so its state is up-to-date when we compute their
+    # disabled flag below.
+    _render_access_panel()
+
     # Show who will be used for generation
     if has_session_data:
         snap = st.session_state["snapshot_obj"]
@@ -1767,6 +1933,17 @@ def main() -> None:
     else:
         st.caption("Generate buttons are disabled — fetch data in the sidebar first.")
 
+    # Compute a single gate flag + tooltip used by every button below.
+    can_use = _can_generate()
+    gate_disabled = not has_session_data or not can_use
+    if not has_session_data:
+        gate_help = "Fetch VedAstro data in the sidebar first."
+    elif not can_use:
+        gate_help = ("Free trial used up — enter your access key in the panel "
+                     "above to keep generating.")
+    else:
+        gate_help = None
+
     c1, c2, c3, c4 = st.columns(4)
 
     # --- generate (fast, direct Python engine) --------------------------------
@@ -1778,17 +1955,20 @@ def main() -> None:
             st.caption("Waiting for birth data…")
 
         if st.button("Generate Loto6", type="primary", use_container_width=True,
-                     disabled=not has_session_data):
+                     disabled=gate_disabled, help=gate_help):
+            _consume_free_use()
             with st.spinner("Generating…"):
                 _generate_direct("loto6")
 
         if st.button("Generate Euromillions", use_container_width=True,
-                     disabled=not has_session_data):
+                     disabled=gate_disabled, help=gate_help):
+            _consume_free_use()
             with st.spinner("Generating…"):
                 _generate_direct("euromillions")
 
         if st.button("Generate EuroJackpot", use_container_width=True,
-                     disabled=not has_session_data):
+                     disabled=gate_disabled, help=gate_help):
+            _consume_free_use()
             with st.spinner("Generating…"):
                 _generate_direct("eurojackpot")
 
@@ -1804,14 +1984,16 @@ def main() -> None:
         st.caption("Fetches history, enriches win-days, then generates.")
 
         if st.button("▶ Play Loto6", use_container_width=True,
-                     disabled=not has_session_data):
+                     disabled=gate_disabled, help=gate_help):
+            _consume_free_use()
             with st.spinner("Running full play for loto6 (may take a few minutes)…"):
                 out = _run_cli(["play", "loto6", "--win-years", str(int(win_years))])
             st.success("Done — see analysis below ↓")
             _render_play_result(out, "loto6")
 
         if st.button("▶ Play EuroMillions", use_container_width=True,
-                     disabled=not has_session_data):
+                     disabled=gate_disabled, help=gate_help):
+            _consume_free_use()
             with st.spinner("Running full play for euromillions…"):
                 out = _run_cli(["play", "euromillions", "--win-years", str(int(win_years))])
             st.success("Done — see analysis below ↓")

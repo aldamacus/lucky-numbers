@@ -1,115 +1,107 @@
-generated_at: '2026-05-09T00:12:04.987956+00:00'
+generated_at: '2026-06-06T19:32:05.477406+00:00'
 self:
-  numerology:
+  numerology: &id001
     name: Alex Damacus
     name_number: 36
     root_number: 9
     ruling_planet: Mars
   natal: {}
 other:
-  numerology:
-    name: Iulia Parlog
-    name_number: 36
-    root_number: 9
-    ruling_planet: Mars
+  numerology: *id001
   natal: {}
 transits:
   self:
     sun:
-      sign: Aries
-      house: 1
-      kaksha: 1
+      sign: Taurus
+      house: 2
+      kaksha: 0
       ashtaka: 5
-      sarvashtaka: 23
+      sarvashtaka: 27
     moon:
-      sign: Capricorn
-      house: 10
-      kaksha: 1
-      ashtaka: 4
-      sarvashtaka: 28
-    mars:
-      sign: Pisces
-      house: 12
+      sign: Aquarius
+      house: 11
       kaksha: 0
-      ashtaka: 2
-      sarvashtaka: 33
-    mercury:
+      ashtaka: 4
+      sarvashtaka: 29
+    mars:
       sign: Aries
       house: 1
       kaksha: 0
-      ashtaka: 5
-      sarvashtaka: 23
-    jupiter:
+      ashtaka: 3
+      sarvashtaka: 28
+    mercury:
       sign: Gemini
       house: 3
       kaksha: 1
-      ashtaka: 6
+      ashtaka: 4
+      sarvashtaka: 30
+    jupiter:
+      sign: Cancer
+      house: 4
+      kaksha: 0
+      ashtaka: 5
       sarvashtaka: 30
     venus:
-      sign: Taurus
-      house: 2
+      sign: Gemini
+      house: 3
       kaksha: 1
       ashtaka: 7
-      sarvashtaka: 28
+      sarvashtaka: 30
     saturn:
       sign: Pisces
       house: 12
-      kaksha: 1
-      ashtaka: 2
-      sarvashtaka: 33
+      kaksha: 0
+      ashtaka: 3
+      sarvashtaka: 29
   other:
     sun:
-      sign: Aries
-      house: 1
+      sign: Taurus
+      house: 2
       kaksha: 0
       ashtaka: 5
-      sarvashtaka: 30
+      sarvashtaka: 27
     moon:
-      sign: Capricorn
-      house: 10
+      sign: Aquarius
+      house: 11
       kaksha: 0
-      ashtaka: 0
-      sarvashtaka: 30
+      ashtaka: 4
+      sarvashtaka: 29
     mars:
-      sign: Pisces
-      house: 12
-      kaksha: 1
-      ashtaka: 2
-      sarvashtaka: 26
-    mercury:
       sign: Aries
       house: 1
+      kaksha: 0
+      ashtaka: 3
+      sarvashtaka: 28
+    mercury:
+      sign: Gemini
+      house: 3
       kaksha: 1
       ashtaka: 4
       sarvashtaka: 30
     jupiter:
+      sign: Cancer
+      house: 4
+      kaksha: 0
+      ashtaka: 5
+      sarvashtaka: 30
+    venus:
       sign: Gemini
       house: 3
       kaksha: 1
-      ashtaka: 6
-      sarvashtaka: 27
-    venus:
-      sign: Taurus
-      house: 2
-      kaksha: 1
-      ashtaka: 6
-      sarvashtaka: 24
+      ashtaka: 7
+      sarvashtaka: 30
     saturn:
       sign: Pisces
       house: 12
       kaksha: 0
-      ashtaka: 5
-      sarvashtaka: 26
+      ashtaka: 3
+      sarvashtaka: 29
 dasa:
   self:
-    mahadasa: null
-    bhukti: null
-    antara: null
+    mahadasa: Mercury
+    bhukti: Saturn
+    antara: Mercury
   other:
-    mahadasa: null
-    bhukti: null
-    antara: null
-relationship:
-  type: Relationship
-  date: '2025-09-24'
-  transits_on_date: {}
+    mahadasa: Mercury
+    bhukti: Saturn
+    antara: Mercury

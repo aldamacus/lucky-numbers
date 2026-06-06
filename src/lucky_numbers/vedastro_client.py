@@ -80,18 +80,36 @@ class VedAstroClient:
         return data.get("result", {})
 
     # Convenience wrappers ---------------------------------------------------
-    def transits(self, birth_date: str, birth_time: str, lat: float, lon: float, tz: str):
+    def transits(self, birth_date: str, birth_time: str, location_name: str):
         return self.call("get_current_transits", {
-            "birth_date": birth_date, "birth_time": birth_time,
-            "latitude": str(lat), "longitude": str(lon), "timezone": tz,
+            "birth_date": birth_date,
+            "birth_time": birth_time,
+            "location_name": location_name,
         })
 
-    def current_dasa(self, birth_date: str, birth_time: str, lat: float, lon: float, tz: str,
-                     query: str = "current dasa"):
-        return self.call("get_current_dasa", {
-            "birth_date": birth_date, "birth_time": birth_time,
-            "latitude": str(lat), "longitude": str(lon), "timezone": tz,
+    def current_dasa(
+        self,
+        birth_date: str,
+        birth_time: str,
+        location_name: str,
+        query: str = "current dasa",
+        check_date: str | None = None,
+        check_time: str = "12:00",
+        levels: int = 3,
+    ):
+        from datetime import datetime, timezone
+
+        if check_date is None:
+            now = datetime.now(timezone.utc)
+            check_date = f"{now.day:02d}/{now.month:02d}/{now.year}"
+        return self.call("get_dasa_at_time", {
+            "birth_date": birth_date,
+            "birth_time": birth_time,
+            "location_name": location_name,
             "query_text": query,
+            "check_date": check_date,
+            "check_time": check_time,
+            "levels": levels,
         })
 
     def numerology(self, name: str):
@@ -101,29 +119,29 @@ class VedAstroClient:
         self,
         check_date: str,
         check_time: str = "12:00",
-        check_timezone: str = "+00:00",
-        query_text: str = "planet positions signs houses",
+        check_location_name: str | None = None,
+        query: str = "planet positions signs houses",
     ) -> dict[str, Any]:
         """Return planetary positions for an arbitrary date (DD/MM/YYYY format).
 
         Uses get_context_based_astrology_data with check_* fields so that no
         birth data is required — only the sky at that moment matters.
         """
-        return self.call("get_context_based_astrology_data", {
+        args: dict[str, Any] = {
+            "query": query,
             "check_date": check_date,
             "check_time": check_time,
-            "check_timezone": check_timezone,
-            "query_text": query_text,
-        })
+        }
+        if check_location_name:
+            args["check_location_name"] = check_location_name
+        return self.call("get_context_based_astrology_data", args)
 
     def natal_chart(
         self,
         birth_date: str,
         birth_time: str,
-        lat: float,
-        lon: float,
-        tz: str,
-        query_text: str = (
+        location_name: str,
+        query: str = (
             "ascendant lagna sign and natal positions of all nine planets "
             "(sun moon mars mercury jupiter venus saturn rahu ketu) "
             "by sign and house"
@@ -132,15 +150,13 @@ class VedAstroClient:
         """Fetch natal-chart-level facts (ascendant + planet houses) per person.
 
         The MCP tool decides which Calculate.* method to invoke based on
-        `query_text`. The response evidence typically contains
+        `query`. The response evidence typically contains
         `AllPlanetSignsBasedOnHouseLongitudes` and a Lagna/Ascendant entry.
         """
         return self.call("get_context_based_astrology_data", {
             "birth_date": birth_date,
             "birth_time": birth_time,
-            "latitude": str(lat),
-            "longitude": str(lon),
-            "timezone": tz,
-            "query_text": query_text,
+            "location_name": location_name,
+            "query": query,
         })
 

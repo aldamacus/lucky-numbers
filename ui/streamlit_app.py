@@ -1389,11 +1389,11 @@ def _fetch_vedastro_for_persons() -> None:
             try:
                 t1 = client.transits(
                     _vedastro_date(b1["date"]), b1["time"],
-                    b1["latitude"], b1["longitude"], b1["timezone"],
+                    b1["location"],
                 )
                 d1 = client.current_dasa(
                     _vedastro_date(b1["date"]), b1["time"],
-                    b1["latitude"], b1["longitude"], b1["timezone"],
+                    b1["location"],
                 )
                 transits["self"] = _normalise_transits(t1)
                 dasa["self"] = _normalise_dasa(d1)
@@ -1404,7 +1404,7 @@ def _fetch_vedastro_for_persons() -> None:
             try:
                 n1 = client.natal_chart(
                     _vedastro_date(b1["date"]), b1["time"],
-                    b1["latitude"], b1["longitude"], b1["timezone"],
+                    b1["location"],
                 )
                 natal_blocks["self"] = _natal_from_payload(n1)
             except Exception as exc:
@@ -1417,11 +1417,11 @@ def _fetch_vedastro_for_persons() -> None:
                 try:
                     t2 = client.transits(
                         _vedastro_date(b2["date"]), b2["time"],
-                        b2["latitude"], b2["longitude"], b2["timezone"],
+                        b2["location"],
                     )
                     d2 = client.current_dasa(
                         _vedastro_date(b2["date"]), b2["time"],
-                        b2["latitude"], b2["longitude"], b2["timezone"],
+                        b2["location"],
                     )
                     transits["other"] = _normalise_transits(t2)
                     dasa["other"] = _normalise_dasa(d2)
@@ -1431,7 +1431,7 @@ def _fetch_vedastro_for_persons() -> None:
                 try:
                     n2 = client.natal_chart(
                         _vedastro_date(b2["date"]), b2["time"],
-                        b2["latitude"], b2["longitude"], b2["timezone"],
+                        b2["location"],
                     )
                     natal_blocks["other"] = _natal_from_payload(n2)
                 except Exception as exc:
@@ -1445,18 +1445,12 @@ def _fetch_vedastro_for_persons() -> None:
                             if hasattr(rel_date_obj, "strftime") else str(rel_date_obj))
                 rel_date_iso = _vedastro_date(rel_dstr)
                 rel_time = ss.get("rel_time", "12:00")
-                # Use Person 1's timezone for the event date (best available proxy)
-                p1_tz_name = ss.get("p1_tz_name", "UTC")
-                try:
-                    ry, rm, rd = (int(x) for x in rel_dstr.split("-"))
-                    rh = int(rel_time.split(":")[0])
-                    rmn = int(rel_time.split(":")[1])
-                except Exception:
-                    ry, rm, rd, rh, rmn = 2000, 1, 1, 12, 0
-                rel_tz = _tz_offset_for_date(p1_tz_name, ry, rm, rd, rh, rmn)
                 with st.spinner("Fetching planetary sky on event date…"):
                     try:
-                        sky_raw = client.sky_at_date(rel_date_iso, rel_time, rel_tz)
+                        sky_raw = client.sky_at_date(
+                            rel_date_iso, rel_time,
+                            check_location_name=b1.get("location") or None,
+                        )
                         sky_transits = _normalise_transits(sky_raw)
                         rel_obj = models.RelationshipData(
                             relation_type=rel_type_val,
@@ -1521,12 +1515,15 @@ def _unwrap_mcp(rpc_result: dict) -> dict:
     if isinstance(content, list) and content:
         first = content[0]
         if isinstance(first, dict) and "text" in first:
+            text = first["text"]
+            if isinstance(text, str) and text.startswith("MCP error"):
+                raise RuntimeError(text)
             try:
-                parsed = json.loads(first["text"])
+                parsed = json.loads(text)
                 if isinstance(parsed, dict):
                     return parsed
             except Exception:
-                return {"raw": first["text"]}
+                raise RuntimeError(f"VedAstro returned non-JSON: {text[:500]}")
     return rpc_result
 
 
@@ -1685,23 +1682,9 @@ def _natal_from_payload(raw: dict) -> dict:
 
 def _normalise_dasa(raw: dict) -> dict:
     """Extract {mahadasa, bhukti, antara} from a VedAstro dasa response."""
-    payload = _unwrap_mcp(raw)
-    levels = payload.get("levels") or payload.get("Levels") or []
-    out: dict = {"mahadasa": None, "bhukti": None, "antara": None}
-    label_map = {"Dasa": "mahadasa", "Mahadasha": "mahadasa",
-                 "Bhukti": "bhukti", "Antaram": "antara", "Antara": "antara"}
-    if isinstance(levels, list):
-        for lvl in levels:
-            if isinstance(lvl, dict):
-                key = label_map.get(lvl.get("level"))
-                if key:
-                    out[key] = lvl.get("planet")
-    # Fallback: top-level keys (used by some response shapes)
-    if not any(out.values()):
-        out["mahadasa"] = payload.get("mahadasa") or payload.get("Mahadasa") or payload.get("MahaDasa")
-        out["bhukti"]   = payload.get("bhukti")   or payload.get("Bhukti")   or payload.get("AntarDasa")
-        out["antara"]   = payload.get("antara")   or payload.get("Antara")   or payload.get("PratyantarDasa")
-    return out
+    from lucky_numbers.cli import _extract_dasa
+
+    return _extract_dasa(_unwrap_mcp(raw))
 
 
 def _save_people_yaml(notify: bool = True) -> bool:

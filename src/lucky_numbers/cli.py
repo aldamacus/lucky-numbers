@@ -216,7 +216,7 @@ def cmd_refresh(
                 console.print(f"[cyan]→ transits ({label})…[/]")
                 res = v.transits(
                     _ddmmyyyy(person.birth.date), person.birth.time,
-                    person.birth.latitude, person.birth.longitude, person.birth.timezone,
+                    person.birth.location,
                 )
                 # Normalize: vedastro returns {"GocharaKakshas": {...}}
                 content = _unwrap(res)
@@ -229,7 +229,7 @@ def cmd_refresh(
                 console.print(f"[cyan]→ dasa ({label})…[/]")
                 res = v.current_dasa(
                     _ddmmyyyy(person.birth.date), person.birth.time,
-                    person.birth.latitude, person.birth.longitude, person.birth.timezone,
+                    person.birth.location,
                     query=f"current dasa for {person.name}",
                 )
                 content = _unwrap(res)
@@ -261,10 +261,13 @@ def _unwrap(rpc_result: dict) -> dict:
     if isinstance(content, list) and content:
         first = content[0]
         if isinstance(first, dict) and "text" in first:
+            text = first["text"]
+            if isinstance(text, str) and text.startswith("MCP error"):
+                raise RuntimeError(text)
             try:
-                return json.loads(first["text"])
+                return json.loads(text)
             except Exception:
-                return {"raw": first["text"]}
+                raise RuntimeError(f"VedAstro returned non-JSON: {text[:500]}")
     return rpc_result if isinstance(rpc_result, dict) else {}
 
 
@@ -277,32 +280,63 @@ _SIGN_TO_INDEX = {
 
 def _normalize_transits(gk: dict, lagna_index: int) -> dict:
     """Convert VedAstro Gochara payload → engine-friendly dict."""
+    if not isinstance(gk, dict):
+        return {}
     out = {}
     for planet, data in gk.items():
-        sign = data.get("Sign", "Aries")
+        if not isinstance(data, dict):
+            continue
+        sign = data.get("Sign") or data.get("sign") or "Aries"
         sign_idx = _SIGN_TO_INDEX.get(sign, 1)
         house = ((sign_idx - lagna_index) % 12) + 1
         out[planet.lower()] = {
             "sign": sign,
             "house": house,
-            "kaksha": int(data.get("KakshaScore", 0)),
-            "ashtaka": int(data.get("Ashtaka", 0)),
-            "sarvashtaka": int(data.get("Sarvashtaka", 0)),
+            "kaksha": int(data.get("KakshaScore", data.get("kaksha", 0)) or 0),
+            "ashtaka": int(data.get("Ashtaka", data.get("ashtaka", 0)) or 0),
+            "sarvashtaka": int(data.get("Sarvashtaka", data.get("sarvashtaka", 0)) or 0),
         }
     return out
 
 
 def _extract_dasa(payload: dict) -> dict:
-    """Best-effort parse of VedAstro current_dasa payload."""
-    levels = payload.get("levels") or []
+    """Best-effort parse of VedAstro dasa payload (levels array or raw_dasa tree)."""
     out = {"mahadasa": None, "bhukti": None, "antara": None}
     label_map = {"Dasa": "mahadasa", "Mahadasha": "mahadasa",
                  "Bhukti": "bhukti", "Antaram": "antara", "Antara": "antara"}
-    for lvl in levels:
-        key = label_map.get(lvl.get("level"))
-        if key:
-            out[key] = lvl.get("planet")
+
+    levels = payload.get("levels") or payload.get("Levels") or []
+    if isinstance(levels, list):
+        for lvl in levels:
+            if isinstance(lvl, dict):
+                key = label_map.get(lvl.get("level"))
+                if key:
+                    out[key] = lvl.get("planet")
+        if any(out.values()):
+            return out
+
+    dasa_at_time = (payload.get("raw_dasa") or {}).get("DasaAtTime") or {}
+    if isinstance(dasa_at_time, dict):
+        for node in dasa_at_time.values():
+            if isinstance(node, dict):
+                _walk_dasa_node(node, out)
+                break
+
+    if not any(out.values()):
+        out["mahadasa"] = payload.get("mahadasa") or payload.get("Mahadasa")
+        out["bhukti"] = payload.get("bhukti") or payload.get("Bhukti")
+        out["antara"] = payload.get("antara") or payload.get("Antara")
     return out
+
+
+def _walk_dasa_node(node: dict, out: dict) -> None:
+    type_map = {"Dasa": "mahadasa", "Bhukti": "bhukti", "Antaram": "antara", "Antara": "antara"}
+    key = type_map.get(node.get("Type"))
+    if key and not out[key]:
+        out[key] = node.get("Lord") or node.get("lord")
+    for sub in (node.get("SubDasas") or {}).values():
+        if isinstance(sub, dict):
+            _walk_dasa_node(sub, out)
 
 
 def main():  # pragma: no cover

@@ -1,4 +1,4 @@
-generated_at: '2026-06-06T19:32:05.477406+00:00'
+generated_at: '2026-06-10T20:42:26.399739+00:00'
 self:
   numerology: &id001
     name: Alex Damacus
@@ -18,15 +18,15 @@ transits:
       ashtaka: 5
       sarvashtaka: 27
     moon:
-      sign: Aquarius
-      house: 11
-      kaksha: 0
-      ashtaka: 4
+      sign: Pisces
+      house: 12
+      kaksha: 1
+      ashtaka: 5
       sarvashtaka: 29
     mars:
       sign: Aries
       house: 1
-      kaksha: 0
+      kaksha: 1
       ashtaka: 3
       sarvashtaka: 28
     mercury:
@@ -42,10 +42,10 @@ transits:
       ashtaka: 5
       sarvashtaka: 30
     venus:
-      sign: Gemini
-      house: 3
+      sign: Cancer
+      house: 4
       kaksha: 1
-      ashtaka: 7
+      ashtaka: 5
       sarvashtaka: 30
     saturn:
       sign: Pisces
@@ -61,15 +61,15 @@ transits:
       ashtaka: 5
       sarvashtaka: 27
     moon:
-      sign: Aquarius
-      house: 11
-      kaksha: 0
-      ashtaka: 4
+      sign: Pisces
+      house: 12
+      kaksha: 1
+      ashtaka: 5
       sarvashtaka: 29
     mars:
       sign: Aries
       house: 1
-      kaksha: 0
+      kaksha: 1
       ashtaka: 3
       sarvashtaka: 28
     mercury:
@@ -85,10 +85,10 @@ transits:
       ashtaka: 5
       sarvashtaka: 30
     venus:
-      sign: Gemini
-      house: 3
+      sign: Cancer
+      house: 4
       kaksha: 1
-      ashtaka: 7
+      ashtaka: 5
       sarvashtaka: 30
     saturn:
       sign: Pisces

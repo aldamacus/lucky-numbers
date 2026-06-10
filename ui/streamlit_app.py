@@ -154,6 +154,31 @@ def _snapshot_age() -> str:
     return str(snap.get("generated_at", "unknown"))
 
 
+def _format_eur_compact(amount: Any, *, signed: bool = False) -> str:
+    """Format whole-EUR amounts for display, e.g. 174984088 → '174.9 Mil'."""
+    if amount is None or amount == "" or amount == "?":
+        return "—"
+    if isinstance(amount, float) and pd.isna(amount):
+        return "—"
+    try:
+        n = int(float(amount))
+    except (TypeError, ValueError):
+        return str(amount)
+
+    prefix = ""
+    if signed and n != 0:
+        prefix = "+" if n > 0 else "-"
+        n = abs(n)
+    elif signed and n == 0:
+        return "0"
+
+    if n >= 1_000_000:
+        return f"{prefix}{n / 1_000_000:.1f} Mil"
+    if n >= 1_000:
+        return f"{prefix}{n / 1_000:.0f} K"
+    return f"{prefix}{n:,}".replace(",", ".")
+
+
 def _load_last_wins(path: Path, n: int = 10) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame()
@@ -336,8 +361,16 @@ def _render_win_table(game_label: str, df: pd.DataFrame, sky_index: dict) -> Non
         "Run **Enrich win-days (VedAstro)** to unlock planet-alignment detail."
     )
 
+    display_df = df.copy()
+    if "jackpot_eur" in display_df.columns:
+        display_df["jackpot_eur"] = display_df["jackpot_eur"].apply(_format_eur_compact)
+    if "delta_from_prev_eur" in display_df.columns:
+        display_df["delta_from_prev_eur"] = display_df["delta_from_prev_eur"].apply(
+            lambda v: _format_eur_compact(v, signed=True)
+        )
+
     event = st.dataframe(
-        df,
+        display_df,
         use_container_width=True,
         hide_index=True,
         on_select="rerun",
@@ -355,8 +388,12 @@ def _render_win_table(game_label: str, df: pd.DataFrame, sky_index: dict) -> Non
     jackpot = row.get("jackpot_eur", "?")
     numbers = _numbers_from_row(row)
 
-    st.markdown(f"#### {date_iso}  —  jackpot {jackpot:,.0f} €" if isinstance(jackpot, (int, float))
-                else f"#### {date_iso}")
+    jp_label = _format_eur_compact(jackpot)
+    st.markdown(
+        f"#### {date_iso}  —  jackpot {jp_label} €"
+        if jp_label != "—"
+        else f"#### {date_iso}"
+    )
 
     # Number breakdown (Chaldean planet for each winning number)
     st.markdown("**Winning numbers — Chaldean planet ruler:**")

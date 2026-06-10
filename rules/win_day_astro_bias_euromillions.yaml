@@ -4,8 +4,8 @@ modifiers:
   action: add_many
   values: &id001
   - 7
-  - 8
   - 3
+  - 8
   - 4
   - 12
   - 5
@@ -13,12 +13,12 @@ modifiers:
   - 9
   - 6
   - 17
-  - 10
   - 2
+  - 10
   - 1
   - 42
-  - 33
   - 44
+  - 33
   - 25
   - 27
   weight: 5

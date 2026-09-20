@@ -44,18 +44,46 @@ copy .env.example .env
 
 ---
 
-## Web UI (branch `my_lucky_numbers`)
+## ▶ Run locally
 
-A **Streamlit** dashboard lets you view the latest 10 jackpot-win draws and
-run every pipeline command from the browser — no terminal needed.
+### Option A — Web UI (recommended)
 
 ```bash
+# make sure you are on the UI branch
 git checkout my_lucky_numbers
 pip install -e .
+
+# start the Streamlit dashboard
 streamlit run ui/streamlit_app.py
 ```
 
-Open **http://localhost:8501** (or the URL Streamlit prints).
+Open **http://localhost:8501** in your browser.
+
+### Option B — CLI only
+
+```bash
+# Refresh live planet snapshot from VedAstro
+python -m lucky_numbers.cli refresh
+
+# Generate EuroMillions numbers
+python -m lucky_numbers.cli generate euromillions
+
+# Generate Austrian Loto 6 numbers
+python -m lucky_numbers.cli generate loto6
+
+# Full pipeline: refresh + update history + rebuild rules + generate + score
+python -m lucky_numbers.cli play euromillions
+
+# Show what the current snapshot looks like
+python -m lucky_numbers.cli show
+
+# Run the weight backtester (finds the best rule weights from last 100 draws)
+python scripts/backtest_euromillions.py --draws 100 --iterations 1000
+```
+
+---
+
+## Web UI details (branch `my_lucky_numbers`)
 
 | Panel | What it does |
 |---|---|

@@ -21,6 +21,5 @@ modifiers:
   - 29
   - 34
   - 9
-  weight: 6
-  reason: Boost numbers frequently appearing on historical jackpot-win days (AT Lotto
-    6 aus 45), giving win-days higher importance.
+  weight: 2
+  reason: Boost numbers frequently appearing on historical jackpot-win days (AT Lotto 6 aus 45), giving win-days higher importance.

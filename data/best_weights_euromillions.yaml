@@ -1,0 +1,27 @@
+backtest:
+  draws: 100
+  date_range: 2025-06-27 to 2026-06-09
+  iterations: 500
+  strict_score: 0.343
+  top10_score: 0.615
+  default_strict: 0.305
+  improvement: 0.038
+  random_baseline: 0.266667
+best_weights:
+  birth_mult: 1.0
+  transit_benefic: 5
+  transit_strongest: 2
+  transit_house: 0
+  dasa_maha_p1: 5
+  dasa_bhukti_p1: 4
+  dasa_antara_p1: 2
+  dasa_maha_p2: 4
+  dasa_bhukti_p2: 2
+  combined: 1
+  winday_global: 2
+  winday_system: 2
+  winday_sign_p1: 14
+  winday_sign_p2: 5
+  moon_strong: 8
+  moon_moderate: 3
+  moon_weak: 6

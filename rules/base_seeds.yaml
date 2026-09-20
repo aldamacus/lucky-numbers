@@ -1,69 +1,53 @@
-# Static seed numbers derived from birth + numerology.
-# Each entry contributes deterministic candidate numbers to the pool.
 seeds:
-  - id: self_root_number
-    expr: "self.numerology.root_number"
-    weight: 3
-    reason: "Person 1 (self) numerology root"
-
-  - id: self_name_number_compound
-    expr: "self.numerology.name_number"
-    weight: 2
-    reason: "Person 1 (self) full name compound number"
-
-  - id: self_birth_day
-    expr: "self.birth.day"
-    weight: 2
-    reason: "Person 1 (self) birth day"
-
-  - id: self_birth_month
-    expr: "self.birth.month"
-    weight: 1
-    reason: "Person 1 (self) birth month"
-
-  - id: self_lagna_index
-    expr: "self.natal.lagna_sign_index"
-    weight: 2
-    reason: "Person 1 (self) Lagna sign index"
-
-  - id: self_moon_house
-    expr: "self.natal.moon_house"
-    weight: 1
-    reason: "Person 1 (self) Moon house"
-
-  - id: other_birth_day
-    expr: "other.birth.day"
-    weight: 2
-    reason: "Person 2 (other) birth day"
-
-  - id: other_birth_month
-    expr: "other.birth.month"
-    weight: 1
-    reason: "Person 2 (other) birth month"
-
-  - id: other_lagna_index
-    expr: "other.natal.lagna_sign_index"
-    weight: 2
-    reason: "Person 2 (other) Lagna sign index"
-
-  - id: other_jupiter_house
-    expr: "other.natal.jupiter_house"
-    weight: 2
-    reason: "Person 2 (other) Jupiter house — natural benefic"
-
-  # Compounds (numerology favors compound numbers like 23, 32, 41)
-  - id: royal_star_23
-    expr: "23"
-    weight: 3
-    reason: "Royal Star of the Lion — protected success"
-
-  - id: jupiter_compound_3
-    expr: "3"
-    weight: 2
-    reason: "Jupiter root number"
-
-  - id: self_other_axis
-    expr: "(self.natal.lagna_sign_index + other.natal.lagna_sign_index) % 50"
-    weight: 2
-    reason: "Combined Person 1 + Person 2 lagna axis (mod 50)"
-
+- id: self_root_number
+  expr: self.numerology.root_number
+  weight: 3
+  reason: Person 1 (self) numerology root
+- id: self_name_number_compound
+  expr: self.numerology.name_number
+  weight: 2
+  reason: Person 1 (self) full name compound number
+- id: self_birth_day
+  expr: self.birth.day
+  weight: 2
+  reason: Person 1 (self) birth day
+- id: self_birth_month
+  expr: self.birth.month
+  weight: 1
+  reason: Person 1 (self) birth month
+- id: self_lagna_index
+  expr: self.natal.lagna_sign_index
+  weight: 2
+  reason: Person 1 (self) Lagna sign index
+- id: self_moon_house
+  expr: self.natal.moon_house
+  weight: 1
+  reason: Person 1 (self) Moon house
+- id: other_birth_day
+  expr: other.birth.day
+  weight: 2
+  reason: Person 2 (other) birth day
+- id: other_birth_month
+  expr: other.birth.month
+  weight: 1
+  reason: Person 2 (other) birth month
+- id: other_lagna_index
+  expr: other.natal.lagna_sign_index
+  weight: 2
+  reason: Person 2 (other) Lagna sign index
+- id: other_jupiter_house
+  expr: other.natal.jupiter_house
+  weight: 2
+  reason: Person 2 (other) Jupiter house — natural benefic
+- id: royal_star_23
+  expr: '23'
+  weight: 3
+  reason: Royal Star of the Lion — protected success
+- id: jupiter_compound_3
+  expr: '3'
+  weight: 2
+  reason: Jupiter root number
+- id: self_other_axis
+  expr: (self.natal.lagna_sign_index + other.natal.lagna_sign_index) % 50
+  weight: 2
+  reason: Combined Person 1 + Person 2 lagna axis (mod 50)

@@ -1,22 +1,19 @@
-# Modifiers using BOTH Person 1's (self) and Person 2's (other) data jointly.
 modifiers:
-  - id: shared_lagna_axis
-    when: "true"
-    action: add
-    value: "self.natal.lagna_sign_index + other.natal.lagna_sign_index"
-    weight: 2
-    reason: "Combined Person 1 + Person 2 lagna axis"
-
-  - id: jupiter_other_house_blend
-    when: "true"
-    action: add
-    value: "(self.natal.jupiter_house + other.natal.jupiter_house) % 50"
-    weight: 1
-    reason: "Person 1 + Person 2 Jupiter house blend"
-
-  - id: birthday_sum
-    when: "true"
-    action: add
-    value: "(self.birth.day + other.birth.day) % 50"
-    weight: 2
-    reason: "Person 1 birth-day + Person 2 birth-day (mod 50)"
+- id: shared_lagna_axis
+  when: 'true'
+  action: add
+  value: self.natal.lagna_sign_index + other.natal.lagna_sign_index
+  weight: 1
+  reason: Combined Person 1 + Person 2 lagna axis
+- id: jupiter_other_house_blend
+  when: 'true'
+  action: add
+  value: (self.natal.jupiter_house + other.natal.jupiter_house) % 50
+  weight: 1
+  reason: Person 1 + Person 2 Jupiter house blend
+- id: birthday_sum
+  when: 'true'
+  action: add
+  value: (self.birth.day + other.birth.day) % 50
+  weight: 1
+  reason: Person 1 birth-day + Person 2 birth-day (mod 50)

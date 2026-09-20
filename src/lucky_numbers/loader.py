@@ -116,6 +116,7 @@ def load_snapshot(
         transits=_normalise_subject_keys(snap.get("transits", {})),
         dasa=_normalise_subject_keys(snap.get("dasa", {})),
         relationship=_parse_relationship(snap.get("relationship")),
+        moon_phase=snap.get("moon_phase") or {},
     )
 
 
@@ -125,8 +126,13 @@ def build_snapshot_from_dicts(
     transits: dict[str, Any] | None = None,
     dasa: dict[str, Any] | None = None,
     relationship: dict[str, Any] | None = None,
+    moon_phase: dict[str, Any] | None = None,
 ) -> Snapshot:
     """Build a Snapshot purely from dicts (no YAML files needed — used by the UI)."""
+    from .moon_phase import compute_moon_phase
+    if moon_phase is None:
+        mp = compute_moon_phase()
+        moon_phase = {"phase": mp.phase, "illumination": mp.illumination, "age_days": mp.age_days}
     self_ = build_person(self_data)
     return Snapshot(
         self_=self_,
@@ -134,6 +140,7 @@ def build_snapshot_from_dicts(
         transits=_normalise_subject_keys(transits),
         dasa=_normalise_subject_keys(dasa),
         relationship=_parse_relationship(relationship),
+        moon_phase=moon_phase,
     )
 
 

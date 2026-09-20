@@ -154,6 +154,25 @@ def _snapshot_age() -> str:
     return str(snap.get("generated_at", "unknown"))
 
 
+def _current_moon_display() -> str:
+    """Return a short moon-phase string from snapshot (or compute live)."""
+    try:
+        from lucky_numbers.moon_phase import compute_moon_phase, PHASE_EMOJI
+        snap = _load_snapshot()
+        mp_dict = snap.get("moon_phase") or {}
+        if mp_dict.get("phase"):
+            phase = mp_dict["phase"]
+            illum = float(mp_dict.get("illumination", 0))
+            age   = float(mp_dict.get("age_days", 0))
+        else:
+            mp = compute_moon_phase()
+            phase, illum, age = mp.phase, mp.illumination, mp.age_days
+        emoji = PHASE_EMOJI.get(phase, "🌙")
+        return f"{emoji} {phase} ({illum:.0%} lit, {age:.1f}d old)"
+    except Exception:
+        return "🌙 moon phase unknown"
+
+
 def _format_eur_compact(amount: Any, *, signed: bool = False) -> str:
     """Format whole-EUR amounts for display, e.g. 174984088 → '174.9 Mil'."""
     if amount is None or amount == "" or amount == "?":
@@ -415,6 +434,58 @@ def _render_win_table(game_label: str, df: pd.DataFrame, sky_index: dict) -> Non
                     st.markdown(ln)
     else:
         st.info("No sky snapshot for this date. Run **Enrich win-days (VedAstro)** to add it.")
+
+
+def _render_moon_phase_card() -> None:
+    """Show the current moon phase as a small visual card."""
+    try:
+        from lucky_numbers.moon_phase import compute_moon_phase, PHASE_EMOJI, ALL_PHASES
+        snap = _load_snapshot()
+        mp_dict = snap.get("moon_phase") or {}
+        if mp_dict.get("phase"):
+            phase = mp_dict["phase"]
+            illum = float(mp_dict.get("illumination", 0))
+            age   = float(mp_dict.get("age_days", 0))
+        else:
+            mp = compute_moon_phase()
+            phase, illum, age = mp.phase, mp.illumination, mp.age_days
+
+        emoji = PHASE_EMOJI.get(phase, "🌙")
+        # Illumination bar (8 segments)
+        filled  = round(illum * 8)
+        bar     = "█" * filled + "░" * (8 - filled)
+
+        st.markdown(
+            f"<div style='background:#1a1a2e;border-radius:10px;padding:10px 14px;"
+            f"margin-bottom:8px;font-size:0.9rem'>"
+            f"<span style='font-size:1.6rem'>{emoji}</span> "
+            f"<strong>{phase}</strong><br>"
+            f"<span style='color:#aaa'>Illumination: {illum:.0%} &nbsp; {bar}</span><br>"
+            f"<span style='color:#aaa'>Age: {age:.1f} days since new moon</span>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        # Mini stats from JSON if available
+        stats_path = ROOT / "data" / "historical" / "analysis" / "moon_phase_win_stats.json"
+        if stats_path.exists():
+            import json
+            stats = json.loads(stats_path.read_text(encoding="utf-8"))
+            rows = []
+            for game_stat in stats:
+                for p in game_stat["phases"]:
+                    if p["phase"] == phase:
+                        rows.append({
+                            "Game": game_stat["game"].replace("austria_lotto_6aus45", "AT Lotto")
+                                                     .replace("euromillions", "EuroMillions"),
+                            "Win-day hits": f"{p['count']}/{game_stat['total_wins']} ({p['pct']:.1f}%)",
+                            "vs expected": f"{'▲' if p['above_expected']>0 else '▼'} {abs(p['above_expected']):.1f}%",
+                        })
+            if rows:
+                st.caption(f"Historical jackpot wins during **{phase}**:")
+                st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+    except Exception as exc:
+        st.caption(f"Moon phase unavailable: {exc}")
 
 
 def _render_planet_table(snap: dict) -> None:
@@ -742,6 +813,10 @@ def _render_play_result(out: str, system: str) -> None:
         _render_number_cards(main, magic, system, snap)
     else:
         st.warning("Could not parse numbers from output — see raw output below.")
+
+    # Moon phase
+    st.markdown("### 🌙 Current moon phase")
+    _render_moon_phase_card()
 
     # Current planet alignment
     st.markdown("### Current planet alignment (VedAstro snapshot)")
@@ -1900,8 +1975,8 @@ def main() -> None:
         "Good luck! 🍀"
     )
     st.caption(
-    #    f"Repo: `{ROOT}`  |  "
         f"VedAstro snapshot: `{_snapshot_age()}`  |  "
+        f"Moon: **{_current_moon_display()}**  |  "
         f"Loaded: `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`"
     )
 
@@ -2074,6 +2149,17 @@ def main() -> None:
                      disabled=not has_session_data):
             o1 = _run_script("scripts/build_win_day_bias_rules.py")
             o2 = _run_script("scripts/build_win_day_astro_rules.py")
+            st.code(o1 + "\n---\n" + o2)
+
+        st.divider()
+        st.markdown("**🌙 Moon phase**")
+        # Show current moon phase with breakdown
+        _render_moon_phase_card()
+        if st.button("Analyse moon phases on win days", use_container_width=True,
+                     disabled=not has_session_data):
+            with st.spinner("Analysing…"):
+                o1 = _run_script("scripts/analyze_moon_phases_on_wins.py")
+                o2 = _run_script("scripts/build_moon_phase_rules.py")
             st.code(o1 + "\n---\n" + o2)
 
 

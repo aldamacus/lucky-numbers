@@ -74,6 +74,7 @@ class Snapshot:
     dasa: dict[str, dict[str, str]]                  # subject -> {mahadasa,bhukti,antara}
     other: Person | None = None
     relationship: RelationshipData | None = None
+    moon_phase: dict[str, Any] = field(default_factory=dict)  # {phase, illumination, age_days}
 
     def as_context(self) -> dict[str, Any]:
         """Flatten into the dict used by rule expressions.
@@ -81,6 +82,9 @@ class Snapshot:
         Always populates an `other` key. If no second person was supplied,
         `other` aliases to `self`, so rules reading `other.birth.day` still
         evaluate cleanly (they'll just match Person 1).
+
+        ``moon_phase`` is exposed as a plain dict so rules can access
+        ``moon_phase.phase``, ``moon_phase.illumination``, etc.
         """
         other_person = self.other if self.other is not None else self.self_
         ctx: dict[str, Any] = {
@@ -88,6 +92,7 @@ class Snapshot:
             "other": self._person_dict(other_person),
             "transits": self.transits,
             "dasa": self.dasa,
+            "moon_phase": self.moon_phase or {},
         }
         if self.relationship is not None:
             ctx["relationship"] = {

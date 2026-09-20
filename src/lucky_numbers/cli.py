@@ -126,11 +126,21 @@ def cmd_play(
         _run_repo_script("scripts/build_win_day_bias_rules.py")
         _run_repo_script("scripts/build_win_day_astro_rules.py")
 
+        console.print("[cyan]→ analysing moon phases on win days…[/]")
+        _run_repo_script("scripts/analyze_moon_phases_on_wins.py")
+        _run_repo_script("scripts/build_moon_phase_rules.py")
+
     # 3) Generate + score
     result = generate(system)
 
+    # Show current moon phase alongside results
+    from .moon_phase import compute_moon_phase, PHASE_EMOJI
+    _mp = compute_moon_phase()
+    _mp_emoji = PHASE_EMOJI.get(_mp.phase, "")
+
     main_str = "  ".join(f"[bold cyan]{n:>2}[/]" for n in result.main)
     console.print(f"\n[bold]System:[/] {system}")
+    console.print(f"[bold]Moon phase:[/] {_mp_emoji} {_mp.phase} (illumination {_mp.illumination:.1%})")
     console.print(f"[bold]Main:[/]  {main_str}")
     if result.magic:
         magic_str = "  ".join(f"[bold magenta]{n:>2}[/]" for n in result.magic)
@@ -246,6 +256,20 @@ def cmd_refresh(
                     "root_number": pred.get("RootNumber"),
                     "ruling_planet": pred.get("Planet"),
                 })
+
+    # Always recompute moon phase (pure-Python, no API call needed)
+    from .moon_phase import compute_moon_phase, PHASE_EMOJI
+    mp = compute_moon_phase()
+    snap["moon_phase"] = {
+        "phase": mp.phase,
+        "illumination": mp.illumination,
+        "age_days": mp.age_days,
+    }
+    emoji = PHASE_EMOJI.get(mp.phase, "")
+    console.print(
+        f"[cyan]→ moon phase:[/] {emoji} {mp.phase} "
+        f"(illumination {mp.illumination:.1%}, age {mp.age_days:.1f} days)"
+    )
 
     snap["generated_at"] = datetime.now(_tz.utc).isoformat()
     snap_path.write_text(yaml.safe_dump(snap, sort_keys=False), encoding="utf-8")

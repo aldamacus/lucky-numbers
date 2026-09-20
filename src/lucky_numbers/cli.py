@@ -224,38 +224,48 @@ def cmd_refresh(
         for label, person in [("self", self_), ("other", other)]:
             if transits:
                 console.print(f"[cyan]→ transits ({label})…[/]")
-                res = v.transits(
-                    _ddmmyyyy(person.birth.date), person.birth.time,
-                    person.birth.location,
-                )
-                # Normalize: vedastro returns {"GocharaKakshas": {...}}
-                content = _unwrap(res)
-                gk = content.get("GocharaKakshas", content)
-                snap.setdefault("transits", {})[label] = _normalize_transits(
-                    gk, person.natal.get("lagna_sign_index", 1) if person.natal else 1
-                )
+                try:
+                    res = v.transits(
+                        _ddmmyyyy(person.birth.date), person.birth.time,
+                        person.birth.location,
+                    )
+                    # Normalize: vedastro returns {"GocharaKakshas": {...}}
+                    content = _unwrap(res)
+                    gk = content.get("GocharaKakshas", content)
+                    snap.setdefault("transits", {})[label] = _normalize_transits(
+                        gk, person.natal.get("lagna_sign_index", 1) if person.natal else 1
+                    )
+                except Exception as exc:
+                    console.print(f"[yellow]⚠ transits ({label}) skipped — VedAstro error: {exc}[/]")
+                    console.print("[dim]  Tip: run with --no-transits to skip entirely.[/]")
 
             if dasa:
                 console.print(f"[cyan]→ dasa ({label})…[/]")
-                res = v.current_dasa(
-                    _ddmmyyyy(person.birth.date), person.birth.time,
-                    person.birth.location,
-                    query=f"current dasa for {person.name}",
-                )
-                content = _unwrap(res)
-                snap.setdefault("dasa", {})[label] = _extract_dasa(content)
+                try:
+                    res = v.current_dasa(
+                        _ddmmyyyy(person.birth.date), person.birth.time,
+                        person.birth.location,
+                        query=f"current dasa for {person.name}",
+                    )
+                    content = _unwrap(res)
+                    snap.setdefault("dasa", {})[label] = _extract_dasa(content)
+                except Exception as exc:
+                    console.print(f"[yellow]⚠ dasa ({label}) skipped — VedAstro error: {exc}[/]")
 
             if numerology:
                 console.print(f"[cyan]→ numerology ({person.name})…[/]")
-                res = v.numerology(person.name)
-                content = _unwrap(res)
-                pred = content.get("NameNumberPrediction", content)
-                snap.setdefault(label, {}).setdefault("numerology", {}).update({
-                    "name": person.name,
-                    "name_number": pred.get("Number"),
-                    "root_number": pred.get("RootNumber"),
-                    "ruling_planet": pred.get("Planet"),
-                })
+                try:
+                    res = v.numerology(person.name)
+                    content = _unwrap(res)
+                    pred = content.get("NameNumberPrediction", content)
+                    snap.setdefault(label, {}).setdefault("numerology", {}).update({
+                        "name": person.name,
+                        "name_number": pred.get("Number"),
+                        "root_number": pred.get("RootNumber"),
+                        "ruling_planet": pred.get("Planet"),
+                    })
+                except Exception as exc:
+                    console.print(f"[yellow]⚠ numerology ({person.name}) skipped — VedAstro error: {exc}[/]")
 
     # Always recompute moon phase (pure-Python, no API call needed)
     from .moon_phase import compute_moon_phase, PHASE_EMOJI

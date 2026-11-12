@@ -1,4 +1,4 @@
-generated_at: '2026-06-10T20:42:26.399739+00:00'
+generated_at: '2026-11-12T20:53:31.302646+00:00'
 self:
   numerology: &id001
     name: Alex Damacus
@@ -12,100 +12,100 @@ other:
 transits:
   self:
     sun:
-      sign: Taurus
-      house: 2
+      sign: Libra
+      house: 7
       kaksha: 0
-      ashtaka: 5
-      sarvashtaka: 27
+      ashtaka: 2
+      sarvashtaka: 18
     moon:
-      sign: Pisces
-      house: 12
+      sign: Sagittarius
+      house: 9
       kaksha: 1
       ashtaka: 5
-      sarvashtaka: 29
-    mars:
-      sign: Aries
-      house: 1
-      kaksha: 1
-      ashtaka: 3
       sarvashtaka: 28
-    mercury:
-      sign: Gemini
-      house: 3
-      kaksha: 1
-      ashtaka: 4
-      sarvashtaka: 30
-    jupiter:
-      sign: Cancer
-      house: 4
+    mars:
+      sign: Leo
+      house: 5
       kaksha: 0
-      ashtaka: 5
-      sarvashtaka: 30
-    venus:
-      sign: Cancer
-      house: 4
+      ashtaka: 3
+      sarvashtaka: 25
+    mercury:
+      sign: Libra
+      house: 7
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 18
+    jupiter:
+      sign: Leo
+      house: 5
       kaksha: 1
       ashtaka: 5
-      sarvashtaka: 30
+      sarvashtaka: 25
+    venus:
+      sign: Libra
+      house: 7
+      kaksha: 0
+      ashtaka: 3
+      sarvashtaka: 18
     saturn:
       sign: Pisces
       house: 12
-      kaksha: 0
-      ashtaka: 3
-      sarvashtaka: 29
+      kaksha: 1
+      ashtaka: 2
+      sarvashtaka: 23
   other:
     sun:
-      sign: Taurus
-      house: 2
+      sign: Libra
+      house: 7
       kaksha: 0
-      ashtaka: 5
-      sarvashtaka: 27
+      ashtaka: 2
+      sarvashtaka: 18
     moon:
-      sign: Pisces
-      house: 12
+      sign: Sagittarius
+      house: 9
       kaksha: 1
       ashtaka: 5
-      sarvashtaka: 29
-    mars:
-      sign: Aries
-      house: 1
-      kaksha: 1
-      ashtaka: 3
       sarvashtaka: 28
-    mercury:
-      sign: Gemini
-      house: 3
-      kaksha: 1
-      ashtaka: 4
-      sarvashtaka: 30
-    jupiter:
-      sign: Cancer
-      house: 4
+    mars:
+      sign: Leo
+      house: 5
       kaksha: 0
-      ashtaka: 5
-      sarvashtaka: 30
-    venus:
-      sign: Cancer
-      house: 4
+      ashtaka: 3
+      sarvashtaka: 25
+    mercury:
+      sign: Libra
+      house: 7
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 18
+    jupiter:
+      sign: Leo
+      house: 5
       kaksha: 1
       ashtaka: 5
-      sarvashtaka: 30
+      sarvashtaka: 25
+    venus:
+      sign: Libra
+      house: 7
+      kaksha: 0
+      ashtaka: 3
+      sarvashtaka: 18
     saturn:
       sign: Pisces
       house: 12
-      kaksha: 0
-      ashtaka: 3
-      sarvashtaka: 29
+      kaksha: 1
+      ashtaka: 2
+      sarvashtaka: 23
 dasa:
   self:
-    mahadasa: Mercury
-    bhukti: Saturn
-    antara: Mercury
+    mahadasa: null
+    bhukti: null
+    antara: null
   other:
-    mahadasa: Mercury
-    bhukti: Saturn
-    antara: Mercury
+    mahadasa: null
+    bhukti: null
+    antara: null
 moon_phase:
-  phase: First Quarter
-  illumination: 0.6773
-  age_days: 9.09
+  phase: New Moon
+  illumination: 0.1059
+  age_days: 3.12

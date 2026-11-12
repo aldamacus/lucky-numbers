@@ -1,64 +1,64 @@
 [
   {
     "game": "austria_lotto_6aus45",
-    "total_wins": 357,
+    "total_wins": 371,
     "draw_time": "20:00",
     "phases": [
       {
         "phase": "Waxing Crescent",
-        "count": 49,
-        "pct": 13.73,
+        "count": 53,
+        "pct": 14.29,
         "expected_pct": 12.5,
-        "above_expected": 1.23
+        "above_expected": 1.79
+      },
+      {
+        "phase": "New Moon",
+        "count": 50,
+        "pct": 13.48,
+        "expected_pct": 12.5,
+        "above_expected": 0.98
+      },
+      {
+        "phase": "First Quarter",
+        "count": 50,
+        "pct": 13.48,
+        "expected_pct": 12.5,
+        "above_expected": 0.98
       },
       {
         "phase": "Waxing Gibbous",
         "count": 48,
-        "pct": 13.45,
+        "pct": 12.94,
         "expected_pct": 12.5,
-        "above_expected": 0.95
-      },
-      {
-        "phase": "New Moon",
-        "count": 47,
-        "pct": 13.17,
-        "expected_pct": 12.5,
-        "above_expected": 0.67
-      },
-      {
-        "phase": "First Quarter",
-        "count": 47,
-        "pct": 13.17,
-        "expected_pct": 12.5,
-        "above_expected": 0.67
+        "above_expected": 0.44
       },
       {
         "phase": "Full Moon",
-        "count": 44,
-        "pct": 12.32,
+        "count": 47,
+        "pct": 12.67,
         "expected_pct": 12.5,
-        "above_expected": -0.18
+        "above_expected": 0.17
       },
       {
         "phase": "Last Quarter",
         "count": 44,
-        "pct": 12.32,
+        "pct": 11.86,
         "expected_pct": 12.5,
-        "above_expected": -0.18
+        "above_expected": -0.64
       },
       {
         "phase": "Waning Crescent",
-        "count": 41,
-        "pct": 11.48,
+        "count": 42,
+        "pct": 11.32,
         "expected_pct": 12.5,
-        "above_expected": -1.02
+        "above_expected": -1.18
       },
       {
         "phase": "Waning Gibbous",
         "count": 37,
-        "pct": 10.36,
+        "pct": 9.97,
         "expected_pct": 12.5,
-        "above_expected": -2.14
+        "above_expected": -2.53
       }
     ],
     "detail": [
@@ -2203,69 +2203,153 @@
         "phase": "Last Quarter",
         "illumination": 0.196,
         "age_days": 25.22
+      },
+      {
+        "date": "2026-06-24",
+        "phase": "First Quarter",
+        "illumination": 0.7357,
+        "age_days": 9.69
+      },
+      {
+        "date": "2026-07-19",
+        "phase": "Waxing Crescent",
+        "illumination": 0.2721,
+        "age_days": 5.16
+      },
+      {
+        "date": "2026-07-22",
+        "phase": "First Quarter",
+        "illumination": 0.5822,
+        "age_days": 8.16
+      },
+      {
+        "date": "2026-07-29",
+        "phase": "Full Moon",
+        "illumination": 0.9982,
+        "age_days": 15.16
+      },
+      {
+        "date": "2026-08-19",
+        "phase": "Waxing Crescent",
+        "illumination": 0.4201,
+        "age_days": 6.63
+      },
+      {
+        "date": "2026-09-13",
+        "phase": "New Moon",
+        "illumination": 0.049,
+        "age_days": 2.1
+      },
+      {
+        "date": "2026-09-16",
+        "phase": "Waxing Crescent",
+        "illumination": 0.2664,
+        "age_days": 5.1
+      },
+      {
+        "date": "2026-09-27",
+        "phase": "Full Moon",
+        "illumination": 0.98,
+        "age_days": 16.1
+      },
+      {
+        "date": "2026-10-11",
+        "phase": "New Moon",
+        "illumination": 0.0036,
+        "age_days": 0.57
+      },
+      {
+        "date": "2026-10-14",
+        "phase": "New Moon",
+        "illumination": 0.1372,
+        "age_days": 3.57
+      },
+      {
+        "date": "2026-10-16",
+        "phase": "Waxing Crescent",
+        "illumination": 0.3116,
+        "age_days": 5.57
+      },
+      {
+        "date": "2026-10-18",
+        "phase": "First Quarter",
+        "illumination": 0.5196,
+        "age_days": 7.57
+      },
+      {
+        "date": "2026-10-28",
+        "phase": "Full Moon",
+        "illumination": 0.9138,
+        "age_days": 17.57
+      },
+      {
+        "date": "2026-11-08",
+        "phase": "Waning Crescent",
+        "illumination": 0.0105,
+        "age_days": 28.57
       }
     ]
   },
   {
     "game": "euromillions",
-    "total_wins": 163,
+    "total_wins": 169,
     "draw_time": "21:30",
     "phases": [
       {
         "phase": "Last Quarter",
-        "count": 27,
-        "pct": 16.56,
+        "count": 28,
+        "pct": 16.57,
         "expected_pct": 12.5,
-        "above_expected": 4.06
+        "above_expected": 4.07
       },
       {
         "phase": "First Quarter",
         "count": 25,
-        "pct": 15.34,
+        "pct": 14.79,
         "expected_pct": 12.5,
-        "above_expected": 2.84
+        "above_expected": 2.29
       },
       {
         "phase": "Full Moon",
         "count": 24,
-        "pct": 14.72,
+        "pct": 14.2,
         "expected_pct": 12.5,
-        "above_expected": 2.22
+        "above_expected": 1.7
+      },
+      {
+        "phase": "New Moon",
+        "count": 21,
+        "pct": 12.43,
+        "expected_pct": 12.5,
+        "above_expected": -0.07
       },
       {
         "phase": "Waxing Crescent",
         "count": 21,
-        "pct": 12.88,
+        "pct": 12.43,
         "expected_pct": 12.5,
-        "above_expected": 0.38
-      },
-      {
-        "phase": "New Moon",
-        "count": 19,
-        "pct": 11.66,
-        "expected_pct": 12.5,
-        "above_expected": -0.84
+        "above_expected": -0.07
       },
       {
         "phase": "Waning Gibbous",
-        "count": 19,
-        "pct": 11.66,
+        "count": 21,
+        "pct": 12.43,
         "expected_pct": 12.5,
-        "above_expected": -0.84
+        "above_expected": -0.07
       },
       {
         "phase": "Waxing Gibbous",
-        "count": 14,
-        "pct": 8.59,
+        "count": 15,
+        "pct": 8.88,
         "expected_pct": 12.5,
-        "above_expected": -3.91
+        "above_expected": -3.62
       },
       {
         "phase": "Waning Crescent",
         "count": 14,
-        "pct": 8.59,
+        "pct": 8.28,
         "expected_pct": 12.5,
-        "above_expected": -3.91
+        "above_expected": -4.22
       }
     ],
     "detail": [
@@ -3246,6 +3330,42 @@
         "phase": "Last Quarter",
         "illumination": 0.2806,
         "age_days": 24.28
+      },
+      {
+        "date": "2026-07-03",
+        "phase": "Waning Gibbous",
+        "illumination": 0.8307,
+        "age_days": 18.75
+      },
+      {
+        "date": "2026-08-07",
+        "phase": "Last Quarter",
+        "illumination": 0.2865,
+        "age_days": 24.22
+      },
+      {
+        "date": "2026-09-11",
+        "phase": "New Moon",
+        "illumination": 0.0003,
+        "age_days": 0.16
+      },
+      {
+        "date": "2026-09-25",
+        "phase": "Waxing Gibbous",
+        "illumination": 0.9959,
+        "age_days": 14.16
+      },
+      {
+        "date": "2026-10-02",
+        "phase": "Waning Gibbous",
+        "illumination": 0.6043,
+        "age_days": 21.16
+      },
+      {
+        "date": "2026-11-10",
+        "phase": "New Moon",
+        "illumination": 0.0136,
+        "age_days": 1.1
       }
     ]
   }

@@ -1,4 +1,4 @@
-generated_at: '2026-11-12T21:31:45.497413+00:00'
+generated_at: '2026-11-12T21:45:04.668665+00:00'
 self:
   numerology:
     name: Alex Damacus
@@ -6,14 +6,19 @@ self:
     root_number: 9
     ruling_planet: Mars
   natal:
-    mercury_house: 6
-    jupiter_house: 6
-    sun_house: 5
-    mars_house: 4
-    venus_house: 7
-    saturn_house: 6
-    moon_house: 11
-    moon_sign: Aquarius
+    lagna_sign: Virgo
+    lagna_sign_index: 6
+    lagna_lord: Mercury
+    sun_house: 12
+    moon_house: 5
+    moon_sign: Capricorn
+    mars_house: 11
+    mercury_house: 1
+    jupiter_house: 1
+    venus_house: 2
+    saturn_house: 1
+    rahu_house: 11
+    ketu_house: 5
 other:
   numerology:
     name: Preotel  Bibicel
@@ -21,14 +26,19 @@ other:
     root_number: 6
     ruling_planet: Venus
   natal:
-    mercury_house: 9
-    jupiter_house: 1
-    saturn_house: 11
-    moon_house: 8
+    lagna_sign: Capricorn
+    lagna_sign_index: 10
+    lagna_lord: Saturn
+    sun_house: 11
+    moon_house: 11
     moon_sign: Scorpio
-    sun_house: 8
-    mars_house: 8
-    venus_house: 7
+    mars_house: 11
+    mercury_house: 12
+    jupiter_house: 5
+    venus_house: 11
+    saturn_house: 2
+    rahu_house: 3
+    ketu_house: 9
 transits:
   self:
     sun:
@@ -79,13 +89,13 @@ transits:
       house: 7
       kaksha: 1
       ashtaka: 3
-      sarvashtaka: 27
+      sarvashtaka: 26
     moon:
       sign: Sagittarius
       house: 9
       kaksha: 1
       ashtaka: 4
-      sarvashtaka: 30
+      sarvashtaka: 26
     mars:
       sign: Leo
       house: 5
@@ -97,19 +107,19 @@ transits:
       house: 7
       kaksha: 1
       ashtaka: 5
-      sarvashtaka: 27
+      sarvashtaka: 26
     jupiter:
       sign: Leo
       house: 5
       kaksha: 0
-      ashtaka: 5
+      ashtaka: 4
       sarvashtaka: 33
     venus:
       sign: Libra
       house: 7
       kaksha: 1
-      ashtaka: 7
-      sarvashtaka: 27
+      ashtaka: 6
+      sarvashtaka: 26
     saturn:
       sign: Pisces
       house: 12
@@ -130,6 +140,12 @@ relationship:
   date: '2024-05-09'
   transits_on_date:
     sun:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    moon:
       sign: Aries
       house: 1
       kaksha: 0

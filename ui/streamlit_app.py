@@ -1557,10 +1557,16 @@ def _fetch_vedastro_for_persons() -> None:
                 t1 = client.transits(
                     _vedastro_date(b1["date"]), b1["time"],
                     b1["location"],
+                    latitude=b1.get("latitude"),
+                    longitude=b1.get("longitude"),
+                    timezone=b1.get("timezone"),
                 )
                 d1 = client.current_dasa(
                     _vedastro_date(b1["date"]), b1["time"],
                     b1["location"],
+                    latitude=b1.get("latitude"),
+                    longitude=b1.get("longitude"),
+                    timezone=b1.get("timezone"),
                 )
                 transits["self"] = _normalise_transits(t1)
                 dasa["self"] = _normalise_dasa(d1)
@@ -1585,10 +1591,16 @@ def _fetch_vedastro_for_persons() -> None:
                     t2 = client.transits(
                         _vedastro_date(b2["date"]), b2["time"],
                         b2["location"],
+                        latitude=b2.get("latitude"),
+                        longitude=b2.get("longitude"),
+                        timezone=b2.get("timezone"),
                     )
                     d2 = client.current_dasa(
                         _vedastro_date(b2["date"]), b2["time"],
                         b2["location"],
+                        latitude=b2.get("latitude"),
+                        longitude=b2.get("longitude"),
+                        timezone=b2.get("timezone"),
                     )
                     transits["other"] = _normalise_transits(t2)
                     dasa["other"] = _normalise_dasa(d2)

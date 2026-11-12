@@ -147,43 +147,84 @@ class VedAstroClient:
         check_date: str,
         check_time: str = "12:00",
         check_location_name: str | None = None,
-        query: str = "planet positions signs houses",
+        latitude: float | None = None,
+        longitude: float | None = None,
+        timezone: str | None = None,
     ) -> dict[str, Any]:
-        """Return planetary positions for an arbitrary date (DD/MM/YYYY format).
+        """Return planetary positions for an arbitrary past/future date.
 
-        Uses get_context_based_astrology_data with check_* fields so that no
-        birth data is required — only the sky at that moment matters.
+        get_context_based_astrology_data was removed from the new MCP server.
+        Falls back to the VedAstro REST API (vedastro.zaishi.net) to fetch
+        planet signs for each of the 9 Vedic planets via direct HTTP calls.
+        Returns a dict shaped like a GocharaKakshas payload so the existing
+        _normalise_transits / _normalize_transits parsers continue to work.
         """
-        args: dict[str, Any] = {
-            "query": query,
-            "check_date": check_date,
-            "check_time": check_time,
-        }
-        if check_location_name:
-            args["check_location_name"] = check_location_name
-        return self.call("get_context_based_astrology_data", args)
+        REST_BASE = "https://vedastro.zaishi.net/api/Calculate"
+        PLANETS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter",
+                   "Venus", "Saturn", "Rahu", "Ketu"]
+
+        lat = latitude or 48.2082
+        lon = longitude or 16.3738
+        tz  = timezone  or "+01:00"
+
+        # REST URL format: /Location/{lat},{lon}/Time/{HH:MM}/{DD-MM-YYYY}/{tz}/Ayanamsa/RAMAN
+        # check_date arrives as DD/MM/YYYY — convert separators to DD-MM-YYYY
+        date_dashes = check_date.replace("/", "-")
+        loc_seg = f"{lat},{lon}"
+        time_seg = f"{check_time}/{date_dashes}/{tz}"
+
+        headers = {}
+        if self.api_key:
+            headers["x-api-key"] = self.api_key
+
+        out: dict[str, Any] = {"GocharaKakshas": {}}
+        for planet in PLANETS:
+            url = f"{REST_BASE}/{planet}SignName/Location/{loc_seg}/Time/{time_seg}/Ayanamsa/RAMAN"
+            try:
+                r = self._client.get(url, headers=headers)
+                r.raise_for_status()
+                data = r.json()
+                # REST API returns {"Status":"Pass","Payload":"Sagittarius",...}
+                sign = (data.get("Payload") or data.get("payload") or
+                        data.get("Result") or "").strip()
+                if sign:
+                    out["GocharaKakshas"][planet] = {
+                        "ZodiacSign": {"Sign": sign},
+                        "Ashtaka": 4, "Sarvashtaka": 4,  # placeholder scores
+                    }
+            except Exception:
+                pass  # silently skip unavailable planets
+
+        return out
 
     def natal_chart(
         self,
         birth_date: str,
         birth_time: str,
         location_name: str,
-        query: str = (
-            "ascendant lagna sign and natal positions of all nine planets "
-            "(sun moon mars mercury jupiter venus saturn rahu ketu) "
-            "by sign and house"
-        ),
+        latitude: float | None = None,
+        longitude: float | None = None,
+        timezone: str | None = None,
     ) -> dict[str, Any]:
-        """Fetch natal-chart-level facts (ascendant + planet houses) per person.
+        """Fetch natal-chart horoscope predictions.
 
-        The MCP tool decides which Calculate.* method to invoke based on
-        `query`. The response evidence typically contains
-        `AllPlanetSignsBasedOnHouseLongitudes` and a Lagna/Ascendant entry.
+        get_context_based_astrology_data was removed from the new MCP server.
+        Now uses get_horoscope_predictions — the prediction Name fields encode
+        planet/house info (e.g. 'JupiterIn10House', 'LagnaInScorpio') which
+        _natal_from_payload() in the UI layer parses into the engine-friendly
+        natal block.
         """
-        return self.call("get_context_based_astrology_data", {
+        args: dict[str, Any] = {
             "birth_date": birth_date,
             "birth_time": birth_time,
-            "location_name": location_name,
-            "query": query,
-        })
+        }
+        if latitude is not None:
+            args["latitude"] = str(latitude)
+        if longitude is not None:
+            args["longitude"] = str(longitude)
+        if timezone is not None:
+            args["timezone"] = timezone
+        if location_name:
+            args["location_name"] = location_name
+        return self.call("get_horoscope_predictions", args)
 

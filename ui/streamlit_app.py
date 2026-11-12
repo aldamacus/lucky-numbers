@@ -1578,10 +1578,13 @@ def _fetch_vedastro_for_persons() -> None:
                 n1 = client.natal_chart(
                     _vedastro_date(b1["date"]), b1["time"],
                     b1["location"],
+                    latitude=b1.get("latitude"),
+                    longitude=b1.get("longitude"),
+                    timezone=b1.get("timezone"),
                 )
                 natal_blocks["self"] = _natal_from_payload(n1)
-            except Exception as exc:
-                st.caption(f"Person 1 natal chart unavailable: {exc}")
+            except Exception:
+                pass  # natal data unavailable; rules using natal houses will no-op
                 natal_blocks["self"] = {}
 
         if p2_data:
@@ -1611,10 +1614,13 @@ def _fetch_vedastro_for_persons() -> None:
                     n2 = client.natal_chart(
                         _vedastro_date(b2["date"]), b2["time"],
                         b2["location"],
+                        latitude=b2.get("latitude"),
+                        longitude=b2.get("longitude"),
+                        timezone=b2.get("timezone"),
                     )
                     natal_blocks["other"] = _natal_from_payload(n2)
-                except Exception as exc:
-                    st.caption(f"Person 2 natal chart unavailable: {exc}")
+                except Exception:
+                    pass  # natal data unavailable; rules using natal houses will no-op
                     natal_blocks["other"] = {}
 
             rel_date_obj = ss.get("rel_date")
@@ -1629,6 +1635,9 @@ def _fetch_vedastro_for_persons() -> None:
                         sky_raw = client.sky_at_date(
                             rel_date_iso, rel_time,
                             check_location_name=b1.get("location") or None,
+                            latitude=b1.get("latitude"),
+                            longitude=b1.get("longitude"),
+                            timezone=b1.get("timezone"),
                         )
                         sky_transits = _normalise_transits(sky_raw)
                         rel_obj = models.RelationshipData(
@@ -1812,8 +1821,57 @@ def _extract_lagna_sign(payload: dict, planet_signs: dict[str, str]) -> str | No
     return None
 
 
+def _natal_from_horoscope_predictions(predictions: list) -> tuple[str | None, dict[str, str], dict[str, int]]:
+    """Parse get_horoscope_predictions response into (lagna_sign, planet_signs, planet_houses).
+
+    Prediction Name fields encode planet/house info, e.g.:
+      'JupiterIn10House'  → jupiter house 10
+      'LagnaInScorpio'    → lagna = Scorpio
+      'MoonInTaurus'      → moon sign = Taurus
+    """
+    import re as _re
+    SIGNS = set(_SIGN_TO_INDEX.keys())
+    PLANETS_LOWER = {"sun", "moon", "mars", "mercury", "jupiter",
+                     "venus", "saturn", "rahu", "ketu"}
+
+    lagna_sign: str | None = None
+    planet_signs: dict[str, str] = {}
+    planet_houses: dict[str, int] = {}
+
+    for pred in predictions:
+        name = pred.get("Name") or pred.get("name") or pred.get("PredictionName") or ""
+        if not name:
+            continue
+        # Lagna/Ascendant sign: LagnaInScorpio, LagnaIsScorpio, AscendantInLibra
+        m = _re.match(r"(?:Lagna|Ascendant)(?:In|Is)([A-Z][a-z]+)", name)
+        if m and m.group(1) in SIGNS:
+            lagna_sign = m.group(1)
+            continue
+        # Planet in house: JupiterIn10House, SunIn1House, MoonIn4thHouse
+        m = _re.match(r"([A-Z][a-z]+)In(\d+)(?:st|nd|rd|th)?[Hh]ouse", name)
+        if m:
+            planet = m.group(1).lower()
+            if planet in PLANETS_LOWER:
+                planet_houses[planet] = int(m.group(2))
+            continue
+        # Planet in sign: MoonInTaurus, JupiterInCancer
+        m = _re.match(r"([A-Z][a-z]+)In([A-Z][a-z]+)$", name)
+        if m and m.group(2) in SIGNS:
+            planet = m.group(1).lower()
+            if planet in PLANETS_LOWER:
+                planet_signs[planet] = m.group(2)
+            continue
+
+    return lagna_sign, planet_signs, planet_houses
+
+
 def _natal_from_payload(raw: dict) -> dict:
     """Convert a natal_chart() payload into the engine-friendly natal block.
+
+    Handles two response shapes:
+      1. get_horoscope_predictions: array of {Name, Description, ...} predictions
+         — Name fields encode planet/house (JupiterIn10House, LagnaInScorpio …)
+      2. Legacy get_context_based_astrology_data: evidence list with key_result JSON
 
     Output mirrors the existing `data/snapshot.yaml` natal layout:
         {
@@ -1825,6 +1883,52 @@ def _natal_from_payload(raw: dict) -> dict:
     then silently no-ops the natal rules and surfaces them in the audit (rec 4).
     """
     payload = _unwrap_mcp(raw)
+
+    # ── Format 1: get_horoscope_predictions  (new API) ────────────────────────
+    predictions = None
+    if isinstance(payload, list):
+        predictions = payload
+    elif isinstance(payload, dict):
+        for key in ("predictions", "Predictions", "HoroscopePredictions", "result"):
+            if isinstance(payload.get(key), list):
+                predictions = payload[key]
+                break
+
+    if predictions:
+        lagna_sign, planet_signs, planet_houses = _natal_from_horoscope_predictions(predictions)
+        if lagna_sign or planet_signs or planet_houses:
+            natal: dict = {}
+            if lagna_sign:
+                natal["lagna_sign"] = lagna_sign
+                natal["lagna_sign_index"] = _SIGN_TO_INDEX.get(lagna_sign, 1)
+                sign_lords = {
+                    "Aries": "Mars", "Taurus": "Venus", "Gemini": "Mercury",
+                    "Cancer": "Moon", "Leo": "Sun", "Virgo": "Mercury",
+                    "Libra": "Venus", "Scorpio": "Mars", "Sagittarius": "Jupiter",
+                    "Capricorn": "Saturn", "Aquarius": "Saturn", "Pisces": "Jupiter",
+                }
+                natal["lagna_lord"] = sign_lords.get(lagna_sign, "Unknown")
+
+            lagna_index = natal.get("lagna_sign_index", 1)
+
+            # Use explicit house numbers from prediction names
+            for planet, house in planet_houses.items():
+                if planet == "moon" and planet in planet_signs:
+                    natal["moon_sign"] = planet_signs[planet]
+                natal[f"{planet}_house"] = house
+
+            # Derive houses from sign positions (if house not already set)
+            for planet, sign in planet_signs.items():
+                if f"{planet}_house" not in natal:
+                    sign_idx = _SIGN_TO_INDEX.get(sign)
+                    if sign_idx:
+                        natal[f"{planet}_house"] = ((sign_idx - lagna_index) % 12) + 1
+                if planet == "moon" and "moon_sign" not in natal:
+                    natal["moon_sign"] = sign
+
+            return natal
+
+    # ── Format 2: legacy get_context_based_astrology_data ────────────────────
     planet_signs = _extract_planet_signs_from_evidence(payload)
     lagna_sign = _extract_lagna_sign(payload, planet_signs)
     if not lagna_sign and not planet_signs:

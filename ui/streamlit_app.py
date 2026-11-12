@@ -1928,6 +1928,41 @@ def _natal_from_payload(raw: dict) -> dict:
 
             return natal
 
+    # ── Format 0: new REST API structured response ─────────────────────────────
+    # natal_chart() now returns {"_source":"rest","planet_signs":{...},"lagna_sign":"Scorpio"}
+    if payload.get("_source") == "rest":
+        lagna_sign_str = str(payload.get("lagna_sign", "") or "").strip()
+        raw_signs = payload.get("planet_signs") or {}
+        planet_signs_map: dict[str, str] = {}
+        for k, v in raw_signs.items():
+            sign = v if isinstance(v, str) else (
+                v.get("Name") or v.get("Sign") or v.get("ZodiacSign") or "")
+            if sign:
+                planet_signs_map[k.lower()] = sign
+
+        if lagna_sign_str or planet_signs_map:
+            _SIGN_LORDS = {
+                "Aries": "Mars", "Taurus": "Venus", "Gemini": "Mercury",
+                "Cancer": "Moon", "Leo": "Sun", "Virgo": "Mercury",
+                "Libra": "Venus", "Scorpio": "Mars", "Sagittarius": "Jupiter",
+                "Capricorn": "Saturn", "Aquarius": "Saturn", "Pisces": "Jupiter",
+            }
+            natal: dict = {}
+            if lagna_sign_str in _SIGN_TO_INDEX:
+                natal["lagna_sign"] = lagna_sign_str
+                natal["lagna_sign_index"] = _SIGN_TO_INDEX[lagna_sign_str]
+                natal["lagna_lord"] = _SIGN_LORDS.get(lagna_sign_str, "Unknown")
+
+            lagna_index = natal.get("lagna_sign_index", 1)
+            for planet, sign in planet_signs_map.items():
+                sign_idx = _SIGN_TO_INDEX.get(sign)
+                if sign_idx:
+                    house = ((sign_idx - lagna_index) % 12) + 1
+                    natal[f"{planet}_house"] = house
+                if planet == "moon":
+                    natal["moon_sign"] = sign
+            return natal
+
     # ── Format 2: legacy get_context_based_astrology_data ────────────────────
     planet_signs = _extract_planet_signs_from_evidence(payload)
     lagna_sign = _extract_lagna_sign(payload, planet_signs)

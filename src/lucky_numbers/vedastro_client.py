@@ -18,7 +18,7 @@ from typing import Any
 
 import httpx
 
-DEFAULT_URL = "https://mcp.vedastro.org/api/mcp/public"
+DEFAULT_URL = "https://vedastro.zaishi.net/api/mcp/public"
 
 
 def _load_dotenv_if_present() -> None:
@@ -80,12 +80,28 @@ class VedAstroClient:
         return data.get("result", {})
 
     # Convenience wrappers ---------------------------------------------------
-    def transits(self, birth_date: str, birth_time: str, location_name: str):
-        return self.call("get_current_transits", {
+    def transits(
+        self,
+        birth_date: str,
+        birth_time: str,
+        location_name: str,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        timezone: str | None = None,
+    ):
+        args: dict[str, Any] = {
             "birth_date": birth_date,
             "birth_time": birth_time,
             "location_name": location_name,
-        })
+        }
+        # New API (vedastro.zaishi.net) requires explicit coords + timezone
+        if latitude is not None:
+            args["latitude"] = str(latitude)
+        if longitude is not None:
+            args["longitude"] = str(longitude)
+        if timezone is not None:
+            args["timezone"] = timezone
+        return self.call("get_current_transits", args)
 
     def current_dasa(
         self,
@@ -96,13 +112,16 @@ class VedAstroClient:
         check_date: str | None = None,
         check_time: str = "12:00",
         levels: int = 3,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        timezone: str | None = None,
     ):
-        from datetime import datetime, timezone
+        from datetime import datetime, timezone as _tz
 
         if check_date is None:
-            now = datetime.now(timezone.utc)
+            now = datetime.now(_tz.utc)
             check_date = f"{now.day:02d}/{now.month:02d}/{now.year}"
-        return self.call("get_dasa_at_time", {
+        args: dict[str, Any] = {
             "birth_date": birth_date,
             "birth_time": birth_time,
             "location_name": location_name,
@@ -110,7 +129,15 @@ class VedAstroClient:
             "check_date": check_date,
             "check_time": check_time,
             "levels": levels,
-        })
+        }
+        # New API (vedastro.zaishi.net) requires explicit coords + timezone
+        if latitude is not None:
+            args["latitude"] = str(latitude)
+        if longitude is not None:
+            args["longitude"] = str(longitude)
+        if timezone is not None:
+            args["timezone"] = timezone
+        return self.call("get_dasa_at_time", args)
 
     def numerology(self, name: str):
         return self.call("get_numerology_prediction", {"name": name})

@@ -228,6 +228,9 @@ def cmd_refresh(
                     res = v.transits(
                         _ddmmyyyy(person.birth.date), person.birth.time,
                         person.birth.location,
+                        latitude=person.birth.latitude,
+                        longitude=person.birth.longitude,
+                        timezone=person.birth.timezone,
                     )
                     # Normalize: vedastro returns {"GocharaKakshas": {...}}
                     content = _unwrap(res)
@@ -246,6 +249,9 @@ def cmd_refresh(
                         _ddmmyyyy(person.birth.date), person.birth.time,
                         person.birth.location,
                         query=f"current dasa for {person.name}",
+                        latitude=person.birth.latitude,
+                        longitude=person.birth.longitude,
+                        timezone=person.birth.timezone,
                     )
                     content = _unwrap(res)
                     snap.setdefault("dasa", {})[label] = _extract_dasa(content)

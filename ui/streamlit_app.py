@@ -927,11 +927,59 @@ def _save_form_state() -> None:
     _FORM_STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _seed_from_people_yaml() -> dict:
+    """Return a session-state seed dict built from data/people.yaml (if present)."""
+    try:
+        import yaml as _yaml  # noqa: PLC0415
+        from pathlib import Path as _Path  # noqa: PLC0415
+        people_path = _Path(__file__).resolve().parents[1] / "data" / "people.yaml"
+        if not people_path.exists():
+            return {}
+        data = _yaml.safe_load(people_path.read_text(encoding="utf-8")) or {}
+        people = data.get("people", {})
+        seed: dict = {}
+        mapping = [("p1", people.get("self")), ("p2", people.get("other"))]
+        for prefix, person in mapping:
+            if not person:
+                continue
+            birth = person.get("birth", {})
+            if person.get("name"):
+                seed[f"{prefix}_name"] = person["name"]
+            if birth.get("time"):
+                seed[f"{prefix}_time"] = birth["time"]
+            if birth.get("location"):
+                seed[f"{prefix}_loc"] = birth["location"]
+            # Pre-seed coords + timezone so geocoding is skipped entirely
+            if birth.get("latitude") and birth.get("longitude"):
+                seed[f"{prefix}_lat_geo"] = float(birth["latitude"])
+                seed[f"{prefix}_lon_geo"] = float(birth["longitude"])
+            if birth.get("timezone"):
+                seed[f"{prefix}_tz_name"] = birth["timezone"]
+            if birth.get("date"):
+                try:
+                    seed[f"{prefix}_dob"] = _date.fromisoformat(str(birth["date"]))
+                except Exception:
+                    pass
+        if len([p for _, p in mapping if p]) >= 2:
+            seed["num_people"] = 2
+        return seed
+    except Exception:
+        return {}
+
+
 def _preload_form_state() -> None:
-    """On first render, seed session_state from the saved form file (cross-session persistence)."""
+    """On first render, seed session_state from the saved form file (cross-session persistence).
+    If no form state file exists yet, fall back to data/people.yaml so the form
+    starts pre-filled with the configured persons and geocoding is skipped.
+    """
     if st.session_state.get("_form_loaded"):
         return
     saved = _load_form_state()
+
+    # If no persisted form state, bootstrap from people.yaml
+    if not saved:
+        saved = _seed_from_people_yaml()
+
     for key, val in saved.items():
         if key not in st.session_state:
             if key in ("p1_dob", "p2_dob", "rel_date") and isinstance(val, str):
@@ -1399,7 +1447,14 @@ def _fetch_vedastro_for_persons() -> None:
     with st.sidebar:
         for prefix in (["p1"] + (["p2"] if ss.get("num_people", 1) == 2 else [])):
             loc = ss.get(f"{prefix}_loc", "").strip()
-            if loc:
+            # Skip geocoding if coordinates are already known (e.g. seeded from
+            # people.yaml or a previous successful geocoding call).
+            existing_lat = ss.get(f"{prefix}_lat_geo", 0.0)
+            existing_lon = ss.get(f"{prefix}_lon_geo", 0.0)
+            if loc and existing_lat and existing_lon:
+                tz_name = ss.get(f"{prefix}_tz_name", "UTC")
+                st.caption(f"📍 {loc}: {existing_lat:.4f}, {existing_lon:.4f} · {tz_name}")
+            elif loc:
                 with st.spinner(f"Geocoding {loc}…"):
                     coords = _geocode_location(loc)
                 if coords:
@@ -1410,7 +1465,7 @@ def _fetch_vedastro_for_persons() -> None:
                     ss[f"{prefix}_tz_name"] = tz_name
                     st.caption(f"📍 {loc}: {coords[0]:.4f}, {coords[1]:.4f} · {tz_name}")
                 else:
-                    st.warning(f"Could not geocode '{loc}' — coordinates and timezone set to defaults")
+                    st.warning(f"Could not geocode '{loc}' — enter coordinates manually or check spelling")
                     ss[f"{prefix}_lat_geo"] = 0.0
                     ss[f"{prefix}_lon_geo"] = 0.0
                     ss[f"{prefix}_tz_name"] = "UTC"

@@ -1,4 +1,4 @@
-generated_at: '2026-11-12T21:45:04.668665+00:00'
+generated_at: '2026-11-12T21:54:16.665355+00:00'
 self:
   numerology:
     name: Alex Damacus
@@ -6,19 +6,19 @@ self:
     root_number: 9
     ruling_planet: Mars
   natal:
-    lagna_sign: Virgo
-    lagna_sign_index: 6
-    lagna_lord: Mercury
+    lagna_sign: Libra
+    lagna_sign_index: 7
+    lagna_lord: Venus
     sun_house: 12
     moon_house: 5
-    moon_sign: Capricorn
-    mars_house: 11
-    mercury_house: 1
-    jupiter_house: 1
-    venus_house: 2
-    saturn_house: 1
-    rahu_house: 11
-    ketu_house: 5
+    moon_sign: Aquarius
+    mars_house: 10
+    mercury_house: 12
+    jupiter_house: 12
+    venus_house: 12
+    saturn_house: 12
+    rahu_house: 10
+    ketu_house: 4
 other:
   numerology:
     name: Preotel  Bibicel

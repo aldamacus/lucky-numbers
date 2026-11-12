@@ -1,13 +1,17 @@
-generated_at: '2026-11-12T20:53:31.302646+00:00'
+generated_at: '2026-11-12T21:11:33.723856+00:00'
 self:
-  numerology: &id001
+  numerology:
     name: Alex Damacus
     name_number: 36
     root_number: 9
     ruling_planet: Mars
   natal: {}
 other:
-  numerology: *id001
+  numerology:
+    name: David Damacus
+    name_number: 38
+    root_number: 2
+    ruling_planet: Moon
   natal: {}
 transits:
   self:
@@ -57,45 +61,45 @@ transits:
     sun:
       sign: Libra
       house: 7
-      kaksha: 0
-      ashtaka: 2
-      sarvashtaka: 18
+      kaksha: 1
+      ashtaka: 7
+      sarvashtaka: 39
     moon:
       sign: Sagittarius
       house: 9
       kaksha: 1
-      ashtaka: 5
-      sarvashtaka: 28
+      ashtaka: 2
+      sarvashtaka: 21
     mars:
       sign: Leo
       house: 5
-      kaksha: 0
+      kaksha: 1
       ashtaka: 3
-      sarvashtaka: 25
+      sarvashtaka: 33
     mercury:
       sign: Libra
       house: 7
-      kaksha: 0
-      ashtaka: 4
-      sarvashtaka: 18
+      kaksha: 1
+      ashtaka: 6
+      sarvashtaka: 39
     jupiter:
       sign: Leo
       house: 5
-      kaksha: 1
-      ashtaka: 5
-      sarvashtaka: 25
+      kaksha: 0
+      ashtaka: 7
+      sarvashtaka: 33
     venus:
       sign: Libra
       house: 7
-      kaksha: 0
-      ashtaka: 3
-      sarvashtaka: 18
+      kaksha: 1
+      ashtaka: 4
+      sarvashtaka: 39
     saturn:
       sign: Pisces
       house: 12
-      kaksha: 1
-      ashtaka: 2
-      sarvashtaka: 23
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 31
 dasa:
   self:
     mahadasa: null
@@ -107,5 +111,5 @@ dasa:
     antara: null
 moon_phase:
   phase: New Moon
-  illumination: 0.1059
-  age_days: 3.12
+  illumination: 0.1067
+  age_days: 3.13

@@ -35,6 +35,51 @@ def _load_dotenv_if_present() -> None:
         os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
 
+def geocode_location(location_name: str) -> tuple[float, float]:
+    """Resolve a free-form place name to (lat, lon) via Nominatim.
+
+    Raises RuntimeError if the location cannot be found.
+    """
+    r = httpx.get(
+        "https://nominatim.openstreetmap.org/search",
+        params={"q": location_name, "format": "json", "limit": 1},
+        headers={"User-Agent": "lucky-numbers-vedastro-client/1.0"},
+        timeout=10.0,
+    )
+    r.raise_for_status()
+    results = r.json()
+    if not results:
+        raise RuntimeError(f"Could not geocode location: '{location_name}'")
+    return float(results[0]["lat"]), float(results[0]["lon"])
+
+
+def get_utc_offset(lat: float, lon: float) -> str:
+    """Return ±HH:MM UTC offset for coordinates via timeapi.io (free, no key).
+
+    Falls back to '+00:00' if the service is unreachable.
+    """
+    try:
+        r = httpx.get(
+            "https://timeapi.io/api/timezone/coordinate",
+            params={"latitude": str(lat), "longitude": str(lon)},
+            timeout=8.0,
+        )
+        tz_name = r.json().get("timeZone", "UTC")
+        # Convert IANA name to ±HH:MM using stdlib zoneinfo
+        from zoneinfo import ZoneInfo
+        import datetime as _dt
+        now = _dt.datetime.now(_dt.timezone.utc).replace(tzinfo=ZoneInfo(tz_name))
+        offset = now.utcoffset()
+        if offset is None:
+            return "+00:00"
+        total = int(offset.total_seconds())
+        sign = "+" if total >= 0 else "-"
+        h, m = divmod(abs(total), 3600)
+        return f"{sign}{h:02d}:{m // 60:02d}"
+    except Exception:
+        return "+00:00"
+
+
 class VedAstroClient:
     def __init__(
         self,
@@ -189,31 +234,60 @@ class VedAstroClient:
         planets.  Returns a GocharaKakshas-shaped dict so the existing
         _normalise_transits / _normalize_transits parsers work unchanged.
         """
-        lat = float(latitude or 48.2082)
-        lon = float(longitude or 16.3738)
-        tz  = timezone or "+01:00"
         loc = check_location_name or ""
+        if latitude is not None and longitude is not None:
+            lat, lon = float(latitude), float(longitude)
+        elif loc:
+            lat, lon = geocode_location(loc)
+        else:
+            raise ValueError("sky_at_date requires either lat/lon or check_location_name")
+        tz = timezone or get_utc_offset(lat, lon)
 
         body = {
             "Ayanamsa": "RAMAN",
             "Time": self._std_time(check_date, check_time, tz, lat, lon, loc),
         }
         data = self._rest_post("AllPlanetRasiSigns", body)
-        # Response: {"Status":"Pass","Payload":{"Sun":"Capricorn","Moon":"Aries",...}}
+        # Response payload may be:
+        #   dict  {"Sun": "Capricorn", "Moon": "Aries", ...}
+        #   list  [{"Planet":"Sun","AllPlanetRasiSigns":"Capricorn"}, ...]
         payload = data.get("Payload") or data.get("payload") or {}
 
         out: dict[str, Any] = {"GocharaKakshas": {}}
-        if isinstance(payload, dict):
-            for planet, sign_val in payload.items():
-                # sign_val may be a string "Capricorn" or {"Name":"Capricorn"}
-                sign = sign_val if isinstance(sign_val, str) else (
-                    sign_val.get("Name") or sign_val.get("Sign") or
-                    sign_val.get("ZodiacSign") or "")
-                if sign:
-                    out["GocharaKakshas"][planet] = {
-                        "ZodiacSign": {"Sign": sign},
-                        "Ashtaka": 4, "Sarvashtaka": 4,
-                    }
+
+        def _add_entry(entry: dict) -> None:
+            planet = str(entry.get("Planet", "")).strip()
+            val = next((v for k, v in entry.items() if k != "Planet"), "")
+            sign = str(val).split(":")[0].strip() if val else ""
+            if planet and sign:
+                out["GocharaKakshas"][planet] = {
+                    "ZodiacSign": {"Sign": sign},
+                    "Ashtaka": 4, "Sarvashtaka": 4,
+                }
+
+        # Payload may be:
+        #  list  [{"Planet":"Sun","AllPlanetRasiSigns":"Gemini : 10°..."}, ...]
+        #  dict  {"AllPlanetRasiSigns": [...list...]}   ← wrapper dict
+        #  dict  {"Sun":"Gemini", "Moon":"Aries", ...}  ← flat planet→sign dict
+        if isinstance(payload, list):
+            for entry in payload:
+                _add_entry(entry)
+        elif isinstance(payload, dict):
+            # Check for wrapper dict pattern: single key whose value is a list
+            vals = list(payload.values())
+            if len(vals) == 1 and isinstance(vals[0], list):
+                for entry in vals[0]:
+                    _add_entry(entry)
+            else:
+                # flat planet→sign dict
+                for planet, sign_val in payload.items():
+                    sign = str(sign_val).split(":")[0].strip()
+                    if planet and sign:
+                        out["GocharaKakshas"][planet] = {
+                            "ZodiacSign": {"Sign": sign},
+                            "Ashtaka": 4, "Sarvashtaka": 4,
+                        }
+
         return out
 
     def natal_chart(
@@ -236,20 +310,56 @@ class VedAstroClient:
         natal block.  Falls back to get_horoscope_predictions (MCP) if REST
         calls fail, so legacy parsing path still works.
         """
-        lat = float(latitude or 0.0)
-        lon = float(longitude or 0.0)
-        tz  = timezone or "+00:00"
+        if latitude is not None and longitude is not None:
+            lat, lon = float(latitude), float(longitude)
+        elif location_name:
+            lat, lon = geocode_location(location_name)
+        else:
+            raise ValueError("natal_chart requires either lat/lon or location_name")
+        tz = timezone or get_utc_offset(lat, lon)
 
         time_block = self._std_time(birth_date, birth_time, tz, lat, lon, location_name)
         body = {"Ayanamsa": "RAMAN", "Time": time_block}
 
         try:
-            signs_resp  = self._rest_post("AllPlanetSignsBasedOnHouseLongitudes", body)
-            lagna_resp  = self._rest_post("LagnaSignName", body)
+            signs_resp = self._rest_post("AllPlanetSignsBasedOnHouseLongitudes", body)
+            lagna_resp = self._rest_post("LagnaSignName", body)
+
+            # lagna payload: {"LagnaSignName": "Virgo"} or just "Virgo"
+            lagna_raw = lagna_resp.get("Payload") or lagna_resp.get("payload") or ""
+            if isinstance(lagna_raw, dict):
+                lagna_sign = next(iter(lagna_raw.values()), "")
+            else:
+                lagna_sign = str(lagna_raw)
+
+            # planets payload: list of {"Planet":"Sun","AllPlanetSignsBasedOnHouseLongitudes":"Leo : 20°..."}
+            # OR a wrapper dict {"AllPlanetSignsBasedOnHouseLongitudes": [...list...]}
+            # OR a flat dict {"Sun":"Leo", ...}
+            signs_raw = signs_resp.get("Payload") or signs_resp.get("payload") or {}
+            planet_signs: dict[str, str] = {}
+
+            def _extract_planet_list(lst: list) -> None:
+                for entry in lst:
+                    planet = str(entry.get("Planet", "")).strip()
+                    val = next((str(v) for k, v in entry.items() if k != "Planet"), "")
+                    sign = val.split(":")[0].strip() if ":" in val else val.strip()
+                    if planet and sign:
+                        planet_signs[planet] = sign
+
+            if isinstance(signs_raw, list):
+                _extract_planet_list(signs_raw)
+            elif isinstance(signs_raw, dict):
+                inner_vals = list(signs_raw.values())
+                if len(inner_vals) == 1 and isinstance(inner_vals[0], list):
+                    # wrapper dict: {"AllPlanetSignsBasedOnHouseLongitudes": [...]}
+                    _extract_planet_list(inner_vals[0])
+                else:
+                    planet_signs = {k: str(v).split(":")[0].strip() for k, v in signs_raw.items()}
+
             return {
                 "_source": "rest",
-                "planet_signs": signs_resp.get("Payload") or signs_resp.get("payload") or {},
-                "lagna_sign":   (lagna_resp.get("Payload") or lagna_resp.get("payload") or ""),
+                "planet_signs": planet_signs,
+                "lagna_sign": lagna_sign.strip(),
             }
         except Exception:
             # Fallback: MCP get_horoscope_predictions

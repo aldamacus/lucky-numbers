@@ -1,18 +1,34 @@
-generated_at: '2026-11-12T21:11:33.723856+00:00'
+generated_at: '2026-11-12T21:29:14.299795+00:00'
 self:
   numerology:
     name: Alex Damacus
     name_number: 36
     root_number: 9
     ruling_planet: Mars
-  natal: {}
+  natal:
+    mercury_house: 6
+    jupiter_house: 6
+    sun_house: 5
+    mars_house: 4
+    venus_house: 7
+    saturn_house: 6
+    moon_house: 11
+    moon_sign: Aquarius
 other:
   numerology:
-    name: David Damacus
-    name_number: 38
-    root_number: 2
-    ruling_planet: Moon
-  natal: {}
+    name: Preotel  Bibicel
+    name_number: 51
+    root_number: 6
+    ruling_planet: Venus
+  natal:
+    mercury_house: 9
+    jupiter_house: 1
+    saturn_house: 11
+    moon_house: 8
+    moon_sign: Scorpio
+    sun_house: 8
+    mars_house: 8
+    venus_house: 7
 transits:
   self:
     sun:
@@ -62,44 +78,44 @@ transits:
       sign: Libra
       house: 7
       kaksha: 1
-      ashtaka: 7
-      sarvashtaka: 39
+      ashtaka: 3
+      sarvashtaka: 27
     moon:
       sign: Sagittarius
       house: 9
       kaksha: 1
-      ashtaka: 2
-      sarvashtaka: 21
+      ashtaka: 4
+      sarvashtaka: 30
     mars:
       sign: Leo
       house: 5
       kaksha: 1
-      ashtaka: 3
+      ashtaka: 4
       sarvashtaka: 33
     mercury:
       sign: Libra
       house: 7
       kaksha: 1
-      ashtaka: 6
-      sarvashtaka: 39
+      ashtaka: 5
+      sarvashtaka: 27
     jupiter:
       sign: Leo
       house: 5
       kaksha: 0
-      ashtaka: 7
+      ashtaka: 5
       sarvashtaka: 33
     venus:
       sign: Libra
       house: 7
       kaksha: 1
-      ashtaka: 4
-      sarvashtaka: 39
+      ashtaka: 7
+      sarvashtaka: 27
     saturn:
       sign: Pisces
       house: 12
-      kaksha: 0
+      kaksha: 1
       ashtaka: 4
-      sarvashtaka: 31
+      sarvashtaka: 24
 dasa:
   self:
     mahadasa: null
@@ -109,7 +125,55 @@ dasa:
     mahadasa: null
     bhukti: null
     antara: null
-moon_phase:
-  phase: New Moon
-  illumination: 0.1067
-  age_days: 3.13
+relationship:
+  type: Relationship
+  date: '2024-05-09'
+  transits_on_date:
+    sun:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    mars:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    mercury:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    jupiter:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    venus:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    saturn:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    rahu:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4
+    ketu:
+      sign: Aries
+      house: 1
+      kaksha: 0
+      ashtaka: 4
+      sarvashtaka: 4

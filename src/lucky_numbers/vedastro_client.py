@@ -18,7 +18,7 @@ from typing import Any
 
 import httpx
 
-DEFAULT_URL = "https://vedastro.zaishi.net/api/mcp/public"
+DEFAULT_URL = "https://mcp.vedastro.org/api/mcp/public"
 
 
 def _load_dotenv_if_present() -> None:

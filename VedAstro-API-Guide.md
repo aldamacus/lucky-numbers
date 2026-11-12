@@ -12,7 +12,7 @@ VedAstro is an **open-source Vedic astrology platform** providing 596+ astronomi
 - **API Base URL**: `https://api.vedastro.org/api`
 - **GitHub**: https://github.com/VedAstro/VedAstro
 - **Python Package**: `pip install vedastro`
-- **MCP Server**: `https://vedastro.zaishi.net/api/mcp`  *(updated Nov 2026; old `mcp.vedastro.org` is retired)*
+- **MCP Server**: `https://mcp.vedastro.org/api/mcp`  *(unchanged)*
 
 ---
 
